@@ -50,6 +50,7 @@ For convenience, we'll create a formula object that will be used later:
 
 ```{r form, message=FALSE}
 mod_form <- as.formula(Attrition ~ JobSatisfaction + Gender + MonthlyIncome)
+mod_form
 ```
 
 To evaluate this model, we will use 10 repeats of 10-fold cross-validation and use the 100 holdout samples to evaluate the overall accuracy of the model. 
@@ -129,6 +130,7 @@ Traditionally, the bootstrap has been primarily used to empirically determine th
 For example, are there differences in the median monthly income between genders? 
 
 ```{r type_plot}
+library(ggplot2)
 ggplot(attrition, aes(x = Gender, y = MonthlyIncome)) + 
   geom_boxplot() + 
   scale_y_log10()

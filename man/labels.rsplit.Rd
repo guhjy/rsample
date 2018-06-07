@@ -15,7 +15,7 @@
 A tibble.
 }
 \description{
-Produce a tibble of identification variables so that single 
+Produce a tibble of identification variables so that single
  splits can be linked to a particular resample.
 }
 \examples{
