@@ -1,6 +1,5 @@
 
 
-# doesn't render on Safari -- fix hyperlink
 <img src="rsample_hex_thumb.png" title="hex sticker thumb" alt="rsample" style="display: block; margin: auto;" />
 
 [![Travis-CI Build Status](https://travis-ci.org/topepo/rsample.svg?branch=master)](https://travis-ci.org/topepo/rsample)
