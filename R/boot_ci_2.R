@@ -31,7 +31,7 @@ get_median <- function(split, ...){
 get_diff_median <- function(splits, ...) {
   boot_sample <- analysis(splits)
   theta_i <- median(boot_sample$MonthlyIncome[boot_sample$Gender == "Female"]) -
-    median(boot_sample$MonthlyIncome[boot_sample$Gender == "Male"]) %>%
+    median(boot_sample$MonthlyIncome[boot_sample$Gender == "Male"])
   return(theta_i)
 }
 
@@ -67,8 +67,8 @@ bt_resamples <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
 
 
 # Example 2 ---------------------------------------------------------------
-set.seed(353)
-bt_resamples2 <- bootstraps(attrition, times = 4000, apparent = TRUE) %>%
+# set.seed(353)
+# bt_resamples2 <- bootstraps(attrition, times = 4000, apparent = TRUE) %>%
   # mutate(theta_i = map_dbl(splits, get_diff_median)) %>%
   # mutate(call_me_maybe = call("get_diff_median"))
   # mutate(theta_i = map(splits, median(attrition$MonthlyIncome[attrition$Gender == "Female"]) -
@@ -88,7 +88,7 @@ boot_ci <- function(bt_resamples, statistic, variable, method = "percentile", le
 
   # TO-DO Sure, here I care abut the mean. But how do I generalize for cases
   #  where the mean is NOT theta_obs (the statistic of interest)?
-  do.call(statistic)
+  # do.call(statistic)
   theta_obs <- mean(apparent_vals)
 
   if (method == "percentile") {
