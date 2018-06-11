@@ -1,15 +1,19 @@
+
+#' Corrupted Mind Dump #1
+#' Ignore for now.
+
 #' Bootstrap Confidence Intervals
 #'
-#' @description 
-#' `boot_ci()` can be used to take the results of a resampling procedure 
+#' @description
+#' `boot_ci()` can be used to take the results of a resampling procedure
 #' created by `rsample` and construct a confidence interval for a statistic
 #' of interest.
 #'
-#' @details 
-#' Statistic(s) of interest must be defined by the user. Parameter estimates 
-#' and their corresponding confidence intervals can be bootstrapped, such 
-#' as trimmed mean, difference of medians between two groups, regression 
-#' coefficients, etc. 
+#' @details
+#' Statistic(s) of interest must be defined by the user. Parameter estimates
+#' and their corresponding confidence intervals can be bootstrapped, such
+#' as trimmed mean, difference of medians between two groups, regression
+#' coefficients, etc.
 #'
 
 ### -- Library Calls (take out later) ----------------------------
@@ -30,21 +34,21 @@ library(boot)
   #'
   # high-level api
   boot_ci() <- function(x, method = "percentile", level = 0.95, the.data...) {
-    
+
   alpha <- 1 - level
-  
+
   # loop over method & call the boot_ci
   # name the low-level function to be consisetent with the method arguemtn
   # percentile_ci()
-  f = paste0(method, "_ci") 
-  
+  f = paste0(method, "_ci")
+
   # construct list of arguments
   mean(x,trim = 0.5)
-  
+
   # invoke function via do.call
   do.call(f)
   do.call("mean", list(of_arguments, na.rm=TRUE), trim=0.5)
-    
+
   if (method == "percentile") {
     # don't do detailed computations in this block, just call
     results <- boot_ci_perc(x, alpha, ...)
@@ -63,11 +67,11 @@ library(boot)
     return(results)
   }
   }
-  
-  
-bt_resamples <- 
-  
-  
+
+
+bt_resamples <-
+
+
 
 # low-level api's
 boot_ci_perc <- function(x, alpha, data) {
@@ -105,7 +109,7 @@ boot_ci_bca <- function(x, alpha, the.data, var.name) {
   # // TO-DO I'm sure you can do LOO sampling using rsample()...akin to LOO CV
   # similar to call to boostraps
   loo_cv(the.data)
-  
+
   leave.one.out.theta <- sapply(1:nrow(the.data), function(i) {
     # // TO-DO don't reference $mpg locally
     leave.out.data <- the.data$mpg[-i] # leave out the ith observation
@@ -166,7 +170,7 @@ print(all_results)
 
 
 
-### -- boot::boot() Equivalents ------------------------------- 
+### -- boot::boot() Equivalents -------------------------------
 set.seed(1)
 theta.fun <- function(mtcars, random.indices) {
   boot.data <- mtcars$mpg[random.indices]
