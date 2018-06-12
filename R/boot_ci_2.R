@@ -96,7 +96,8 @@ boot_ci <- function(bt_resamples, statistic, variable, method = "percentile", le
   # the real problem is that get_median() isn't getting a resample
   # bleh
   # mutate(theta_i = map_dbl(splits, get_median))
-  theta_obs <- invoke(statistic)
+  theta_obs <- invoke(statistic, apparent_vals)
+  # theta_obs <- invoke_map(statistic, )
   paste(theta_obs)
   # theta_obs <- mean(apparent_vals)
 
