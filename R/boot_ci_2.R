@@ -59,7 +59,6 @@ get_length <- function(split, ...){
 }
 
 
-
 # Example 1 ---------------------------------------------------------------
 # set.seed(1)
 # bt_resamples <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
@@ -90,10 +89,16 @@ boot_ci <- function(bt_resamples, statistic, variable, method = "percentile", le
   apparent_df <- as.data.frame(apparent_resample)
   apparent_vals <- apparent_df[[variables]]
 
-  # TO-DO Sure, here I care abut the mean. But how do I generalize for cases
+  # TO-DO
+  # Sure, here I care abut the mean. But how do I generalize for cases
   #  where the mean is NOT theta_obs (the statistic of interest)?
-  invoke(statistic)
-  theta_obs <- mean(apparent_vals)
+
+  # the real problem is that get_median() isn't getting a resample
+  # bleh
+  # mutate(theta_i = map_dbl(splits, get_median))
+  theta_obs <- invoke(statistic)
+  paste(theta_obs)
+  # theta_obs <- mean(apparent_vals)
 
   if (method == "percentile") {
     # don't do detailed computations in this block, just call
@@ -128,7 +133,6 @@ boot_ci_t <- function(bt_resamples, alpha, data, theta_obs) {
   # theta_obs = bt_resamples$theta_obs[1]
   theta_b <- (bt_resamples$theta_i-theta_obs)/theta_sd/sqrt(bt_sample_size)
   bootstrap_t <-quantile(theta_b, probs = c(alpha/2, 1-alpha/2))
-
   ci_t <-  theta_obs + bootstrap_t * sd(data) / sqrt(length(data))
   return (ci_t)
 }
@@ -175,9 +179,9 @@ boot_ci_abc <- function(bt_resamples, alpha, data){
 
 
 # Example 1 Results -------------------------------------------------------
-percentile_results <- boot_ci(bt_resamples, statistic = "get_median", variable = "mpg", method = "percentile", level = 0.95)
-pivot_t_results <- boot_ci(bt_resamples, statistic = "get_median", variable = "mpg", method = "pivot-t", level = 0.95)
-bca_results <- boot_ci(bt_resamples, statistic = "get_median", variable = "mpg", method = "bca", level = 0.95)
+percentile_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "percentile", level = 0.95)
+pivot_t_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "pivot-t", level = 0.95)
+bca_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "bca", level = 0.95)
 all_results <- rbind(percentile_results, pivot_t_results, bca_results)
 cat("--- BOOT_CI() --- \n")
 print(all_results)
