@@ -92,20 +92,18 @@ boot_ci <- function(bt_resamples, statistic, variable, method = "percentile", le
   # TO-DO
   # Sure, here I care abut the mean. But how do I generalize for cases
   #  where the mean is NOT theta_obs (the statistic of interest)?
-
-  # the real problem is that get_median() isn't getting a resample
-  # bleh
-  # mutate(theta_i = map_dbl(splits, get_median))
+  # use invoke() function at the expense of making boot_ci() call
+  # annoying with yet ANOTHER added parameter to write in the call
   theta_obs <- invoke(statistic, apparent_vals)
-  # theta_obs <- invoke_map(statistic, )
-  paste(theta_obs)
+  # paste(theta_obs)
   # theta_obs <- mean(apparent_vals)
 
   if (method == "percentile") {
     # don't do detailed computations in this block, just call
     results <- boot_ci_perc(bt_resamples, alpha, apparent_vals, ...)
     return(results)
-  } # and so on
+  } # interesting side-effect..doesn't get called if not possible to calculate?
+  # or is it just a bug?
   if (method == "pivot-t"){
     results <- boot_ci_t(bt_resamples, alpha, apparent_vals, theta_obs, ...)
     return(results)
