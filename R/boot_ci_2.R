@@ -61,8 +61,8 @@ get_length <- function(split, ...){
 
 # Example 1 ---------------------------------------------------------------
 # set.seed(1)
-# bt_resamples <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
-#   mutate(theta_i = map_dbl(splits, get_trimmed_mean, trim = 0.3))
+# bt_resamples1 <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
+#   mutate(theta_i = map_dbl(splits, get_mean))
 
 
 # Example 2 ---------------------------------------------------------------
@@ -95,7 +95,6 @@ boot_ci <- function(bt_resamples, statistic, variable, method = "percentile", le
   # use invoke() function at the expense of making boot_ci() call
   # annoying with yet ANOTHER added parameter to write in the call
   theta_obs <- invoke(statistic, apparent_vals)
-  # paste(theta_obs)
   # theta_obs <- mean(apparent_vals)
 
   if (method == "percentile") {
@@ -176,14 +175,26 @@ boot_ci_abc <- function(bt_resamples, alpha, data){
 }
 
 
-
 # Example 1 Results -------------------------------------------------------
-percentile_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "percentile", level = 0.95)
-pivot_t_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "pivot-t", level = 0.95)
-bca_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "bca", level = 0.95)
+percentile_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "percentile", level = 0.95)
+pivot_t_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "pivot-t", level = 0.95)
+bca_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "bca", level = 0.95)
 all_results <- rbind(percentile_results, pivot_t_results, bca_results)
 cat("--- BOOT_CI() --- \n")
 print(all_results)
+
+
+# Example 2 Results -------------------------------------------------------
+# percentile_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "percentile", level = 0.95)
+# pivot_t_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "pivot-t", level = 0.95)
+# bca_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "bca", level = 0.95)
+# all_results <- rbind(percentile_results, pivot_t_results, bca_results)
+# cat("--- BOOT_CI() --- \n")
+# print(all_results)
+
+
+
+
 
 
 # Example 2 Results -------------------------------------------------------
