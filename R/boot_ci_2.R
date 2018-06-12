@@ -60,9 +60,9 @@ get_length <- function(split, ...){
 
 
 # Example 1 ---------------------------------------------------------------
-# set.seed(1)
-# bt_resamples1 <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
-#   mutate(theta_i = map_dbl(splits, get_mean))
+set.seed(1)
+bt_resamples1 <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
+  mutate(theta_i = map_dbl(splits, get_mean))
 
 
 # Example 2 ---------------------------------------------------------------
@@ -91,7 +91,8 @@ boot_ci <- function(bt_resamples, statistic, variable, method = "percentile", le
 
   # TO-DO
   # Sure, here I care abut the mean. But how do I generalize for cases
-  #  where the mean is NOT theta_obs (the statistic of interest)?
+  # where the mean is NOT theta_obs (the statistic of interest)?
+  #
   # use invoke() function at the expense of making boot_ci() call
   # annoying with yet ANOTHER added parameter to write in the call
   theta_obs <- invoke(statistic, apparent_vals)
@@ -151,7 +152,7 @@ boot_ci_bca <- function(bt_resamples, alpha, data){
   # Error: C stack usage  7970176 is too close to the limit
 
   leave_one_out_theta = sapply(1:length(data), function(i){
-    leave_out_data = data[-i] #leave out the ith observation
+    leave_out_data = data[-i] # leave out the ith observation
     theta_i = mean(leave_out_data)
     return(theta_i)
   })
@@ -159,11 +160,11 @@ boot_ci_bca <- function(bt_resamples, alpha, data){
   theta_minus_one = mean(leave_one_out_theta)
   a = sum( (theta_minus_one - leave_one_out_theta)^3)/( 6 *(sum( (theta_minus_one - leave_one_out_theta)^2))^(3/2) )
 
-  Zu = (Z0+Za)/(1-a*(Z0+Za)) + Z0 #upper limit for Z
-  Zl = (Z0-Za)/(1-a*(Z0-Za)) + Z0 #Lower limit for Z
-  lower_percentile = pnorm(Zl,lower.tail = TRUE) #percentile for Z
-  upper_percentile = pnorm(Zu,lower.tail = TRUE) #percentile for Z
-  ci_bca = as.numeric(quantile(bt_resamples$theta_i, c(lower_percentile,upper_percentile))) #putting those percentiles in place of alpha/2, 1-alpha/
+  Zu = (Z0+Za)/(1-a*(Z0+Za)) + Z0 # upper limit for Z
+  Zl = (Z0-Za)/(1-a*(Z0-Za)) + Z0 # Lower limit for Z
+  lower_percentile = pnorm(Zl,lower.tail = TRUE) # percentile for Z
+  upper_percentile = pnorm(Zu,lower.tail = TRUE) # percentile for Z
+  ci_bca = as.numeric(quantile(bt_resamples$theta_i, c(lower_percentile,upper_percentile))) # putting those percentiles in place of alpha/2, 1-alpha/
   return(ci_bca)
 }
 
@@ -176,35 +177,32 @@ boot_ci_abc <- function(bt_resamples, alpha, data){
 
 
 # Example 1 Results -------------------------------------------------------
-percentile_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "percentile", level = 0.95)
-pivot_t_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "pivot-t", level = 0.95)
-bca_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "bca", level = 0.95)
-all_results <- rbind(percentile_results, pivot_t_results, bca_results)
-cat("--- BOOT_CI() --- \n")
-print(all_results)
-
-
-# Example 2 Results -------------------------------------------------------
-# percentile_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "percentile", level = 0.95)
-# pivot_t_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "pivot-t", level = 0.95)
-# bca_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "bca", level = 0.95)
+# percentile_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "percentile", level = 0.95)
+# pivot_t_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "pivot-t", level = 0.95)
+# bca_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "bca", level = 0.95)
 # all_results <- rbind(percentile_results, pivot_t_results, bca_results)
 # cat("--- BOOT_CI() --- \n")
 # print(all_results)
 
 
-
-
-
-
 # Example 2 Results -------------------------------------------------------
+percentile_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "percentile", level = 0.95)
+pivot_t_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "pivot-t", level = 0.95)
+bca_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "bca", level = 0.95)
+all_results <- rbind(percentile_results, pivot_t_results, bca_results)
+cat("--- BOOT_CI() --- \n")
+print(all_results)
+
+
+
+# Example 3 Results -------------------------------------------------------
 #######
 # TO-DO this won't work unless you get rid of the calls to mtcars & mtcars$mpg
 # within the confidence interval methods
 ####
-# percentile_results <- boot_ci(bt_resamples2, method = "percentile", level = 0.05)
-# pivot_t_results <- boot_ci(bt_resamples2, method = "pivot-t", level=0.05)
-# bca_results <- boot_ci(bt_resamples2, method = "bca", level=0.05)
+# percentile_results <- boot_ci(bt_resamples3, method = "percentile", level = 0.05)
+# pivot_t_results <- boot_ci(bt_resamples3, method = "pivot-t", level=0.05)
+# bca_results <- boot_ci(bt_resamples3, method = "bca", level=0.05)
 # all_results <- rbind(percentile_results, pivot_t_results, bca_results)
 # print(all_results)
 
