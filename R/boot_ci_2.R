@@ -19,25 +19,12 @@ get_median <- function(split, ...){
   return(theta_i)
 }
 
-# get_diff_means <- function(split, ...){
-  # bt_samp <- analysis(split)
-  # theta_i <- btsamp[[- x_2
-# }
-
 get_diff_median <- function(splits, ...) {
   boot_sample <- analysis(splits)
   theta_i <- median(boot_sample$MonthlyIncome[boot_sample$Gender == "Female"]) -
     median(boot_sample$MonthlyIncome[boot_sample$Gender == "Male"])
   return(theta_i)
 }
-
-# first_resample <- bt_resamples2$splits[[1]]
-# head(as.data.frame(first_resample))
-# nrow(as.data.frame(first_resample))
-# many_splits <- analysis(first_resample)
-# theta_i <- median(many_splits$MonthlyIncome[many_splits$Gender == "Female"]) -
-#   median(many_splits$MonthlyIncome[many_splits$Gender == "Male"])
-# theta_i
 
 
 # Helper Functions --------------------------------------------------------
@@ -53,28 +40,6 @@ get_length <- function(split, variable,...){
   bt_sample_size <- length(bt_samp[[variable]])
   return(bt_sample_size)
 }
-
-
-# Example 1 ---------------------------------------------------------------
-set.seed(1)
-bt_resamples1 <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
-  mutate(theta_i = map_dbl(splits, get_mean))
-
-
-# Example 2 ---------------------------------------------------------------
-set.seed(1)
-bt_resamples2 <- bootstraps(mtcars, times = 4000, apparent = TRUE) %>%
-  mutate(theta_i = map_dbl(splits, get_median))
-
-
-# Example 3 ---------------------------------------------------------------
-set.seed(353)
-bt_resamples3 <- bootstraps(attrition, times = 4000, apparent = TRUE) %>%
-mutate(theta_i = map_dbl(splits, get_diff_median)) %>%
-mutate(call_me_maybe = call("get_diff_median"))
-mutate(theta_i = map(splits, median(attrition$MonthlyIncome[attrition$Gender == "Female"]) -
-median(attrition$MonthlyIncome[attrition$Gender == "Male"])))
-bt_resamples$wage_diff <- map_dbl(bt_resamples2$splits, get_diff_median) %>%
 
 
 # High-Level API ----------------------------------------------------------
@@ -111,6 +76,7 @@ boot_ci <- function(bt_resamples, statistic, variable, method = "percentile", le
   if (method == "abc"){
     results <- boot_ci_abc(bt_resamples, alpha, apparent_vals, ...)
     return(results)
+
   }
 }
 
@@ -172,49 +138,3 @@ boot_ci_abc <- function(bt_resamples, alpha, data){
         \n analytically, without using any Monte Carlo replications at all. \n
         The S function is called: abcnon(x, tt)")
 }
-
-
-# Example 1 Results -------------------------------------------------------
-# percentile_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "percentile", level = 0.95)
-# pivot_t_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "pivot-t", level = 0.95)
-# bca_results <- boot_ci(bt_resamples1, statistic = "get_mean", variable = "mpg", method = "bca", level = 0.95)
-# all_results <- rbind(percentile_results, pivot_t_results, bca_results)
-# cat("--- BOOT_CI() --- \n")
-# print(all_results)
-
-
-# Example 2 Results -------------------------------------------------------
-percentile_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "percentile", level = 0.95)
-pivot_t_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "pivot-t", level = 0.95)
-bca_results <- boot_ci(bt_resamples2, statistic = "get_median", variable = "mpg", method = "bca", level = 0.95)
-all_results <- rbind(percentile_results, pivot_t_results, bca_results)
-cat("--- BOOT_CI() --- \n")
-print(all_results)
-
-
-
-# Example 3 Results -------------------------------------------------------
-#######
-# TO-DO this won't work unless you get rid of the calls to mtcars & mtcars$mpg
-# within the confidence interval methods
-####
-# percentile_results <- boot_ci(bt_resamples3, method = "percentile", level = 0.05)
-# pivot_t_results <- boot_ci(bt_resamples3, method = "pivot-t", level=0.05)
-# bca_results <- boot_ci(bt_resamples3, method = "bca", level=0.05)
-# all_results <- rbind(percentile_results, pivot_t_results, bca_results)
-# print(all_results)
-
-
-
-# Boot() Package ----------------------------------------------------------
-library(boot)
-theta_fun = function(mtcars, random_indices){
-  boot_data = mtcars$mpg[random_indices]
-  theta_i = mean(boot_data)
-  return(theta_i)
-}
-boot_resamples = boot(mtcars, theta_fun, R = 4000)
-boot_package_results <- boot.ci(boot_resamples)
-cat("\n\n---BOOT PACKAGE---\n")
-print(boot_package_results)
-
