@@ -24,7 +24,7 @@ An tibble with classes `bootstraps`, `rset`, `tbl_df`, `tbl`, and `data.frame`. 
 A bootstrap sample is a sample that is the same size as the original data set that is made using replacement.  This results in analysis samples that have multiple replicates of some of the original rows of the data. The assessment set is defined as the rows of the original data that were not included in the bootstrap sample. This is often referred to as the "out-of-bag" (OOB) sample.
 }
 \details{
-The argument `apparent` enables the option of an additional "resample" where the analysis and assessment data sets are the same as the original data set. This can be required for some types of analysis of the bootstrap results. 
+The argument `apparent` enables the option of an additional "resample" where the analysis and assessment data sets are the same as the original data set. This can be required for some types of analysis of the bootstrap results.
 
 The `strata` argument is based on a similar argument in the random forest package were the bootstrap samples are conducted *within the stratification variable*. The can help ensure that the number of data points in the bootstrap sample is equivalent to the proportions in the original data set.
 }

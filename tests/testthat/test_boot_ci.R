@@ -4,12 +4,18 @@ library(rsample)
 
 
 # things to check for:
-# missing data
-# all same estimates
-# make sure that bt_resamples is a boostrap object (inherits)
-# make sure theta_obs is not NA
-# make sure that z_pntl has two unique values
-# check against rand normal data and standard CI
+# ? missing data
+ # Where do I care about missing data? bt?
+# ? all same estimates (as original boot package? that means the user has
+# to dowload it which is annoying --too bad for now I guess. I need the
+# straightforward benchmark that it provides.)
+
+# X make sure that bt_resamples is a boostrap object (inherits)
+# X make sure theta_obs is not NA
+# X make sure that z_pntl has two unique values
+
+# ? check against rand normal data and standard CI
+  # how does this comparison look like?
 
 
 
@@ -22,6 +28,7 @@ set.seed(646)
 bt <- bootstraps(iris, apparent = TRUE, times = 10000) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
+
 results <- rsample:::boot_ci_t(
   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
   var = "tmean",
@@ -29,6 +36,15 @@ results <- rsample:::boot_ci_t(
   theta_obs = bt %>% dplyr::filter(id == "Apparent")
 )
 
+
+# which dataframe is ocmplete?
+test_that('there is no missing data?', {
+
+})
+
+test_that('no missing values', {
+  expect_identical(testing_data, na.omit(testing_data))
+})
 
 
 test_that('z_pntl has two unique values', {
