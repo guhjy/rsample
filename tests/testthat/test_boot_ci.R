@@ -43,8 +43,6 @@ get_tmean <- function(x)
 # impute some missing values in iris
 test_that('upper & lower confidence interval does not contain NA', {
 
-  # iris_na <- apply(iris, 2,
-  #             function(x) ifelse(runif(nrow(iris)) > 0.5, NA, x))
   iris_na<- iris
   iris_na$Sepal.Width[c(1, 51, 101)] <- NA
 
@@ -61,13 +59,6 @@ test_that('upper & lower confidence interval does not contain NA', {
       theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
     )
   )
-  # expect_warning(theta_obs)
-  # expect_warning(theta_se)
-
-
-  #expect_true(is.na(results_na$lower))
-  #expect_true(is.na(results_na$upper))
-  # expect_equal(sum(is.na(results_na)), 2)
 })
 
 
