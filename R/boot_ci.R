@@ -1,11 +1,5 @@
 # Bootstrap Confidence Intervals
 
-# things to check for:
-# missing data
-# all same estimates
-# make sure that bt_resamples is a boostrap object (inherits)
-# make sure theta_obs is not NA
-# make sure that z_pntl has two unique values
 # check against rand normal data and standard CI
 #' @importFrom stats sd
 #' @export
@@ -20,7 +14,7 @@ boot_ci_t <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
   # then write a test case for that
   if (theta_se == (0 | Inf))
     stop("Your standard error (theta_se) is 0 or infinity.", call. = FALSE)
-  # abort perhaps
+  # rlang::abort()
 
   z_dist <- (bt_resamples[[var]] - theta_obs)/theta_se
   z_pntl <- quantile(z_dist, probs = c(alpha/2, 1 - (alpha)/2), na.rm = TRUE)
