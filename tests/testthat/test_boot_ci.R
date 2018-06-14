@@ -1,3 +1,4 @@
+context("boot_ci")
 library(testthat)
 library(rsample)
 
@@ -20,6 +21,19 @@ get_tmean <- function(x)
 set.seed(646)
 bt <- bootstraps(iris, apparent = TRUE, times = 10000) %>%
   dplyr::mutate(tmean = get_tmean(splits))
+
+results <- rsample:::boot_ci_t(
+  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+  var = "tmean",
+  alpha = 0.05,
+  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+)
+
+
+
+test_that('z_pntl has two unique values', {
+  expect_false(results$lower == results$upper)
+})
 
 
 test_that('bt_resamples is a bootstrap object', {
