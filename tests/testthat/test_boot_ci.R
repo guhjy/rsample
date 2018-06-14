@@ -1,9 +1,11 @@
 context("boot_ci")
 library(testthat)
 library(rsample)
+library(purrr)
 
 
 # things to check for:
+
 
 # ? missing data
 # Where do I care about missing data? bt?
@@ -15,86 +17,63 @@ library(rsample)
 # num of unique datapoints
 # only one unique === FAILURE
 # stop divide by 0
-# hey all of your bootstrap estimates are the same
-# (as original boot package? that means the user has
-# to dowload it which is annoying --too bad for now I guess. I need the
-# straightforward benchmark that it provides.)
 
-# X make sure that bt_resamples is a boostrap object (inherits)
-# X make sure theta_obs is not NA
-# X make sure that z_pntl has two unique values
 
-# ? check against rand normal data and standard CI
-  # how does this comparison look like?
-  # EX
-# b=10000
-  # rnorm(500, 10, 1)
-  # analyhtically tractically , mean
-  # t.test
-  # the mean
-  # get p
-  # expects_equal
-  # within another tolerance
-  # diable double precision
-  # lower numerical tolearnce
-
-  # expect_equivalent
-  # looks at the values not the properties like rownames or colnames
 
   # bug
   # 2 tibbles -- look all counts the same but underlying is different
 
 
 get_tmean <- function(x)
-  purrr::map_dbl(x,
+  map_dbl(x,
           function(x)
-            mean(analysis(x)[["Sepal.Width"]], trim = 0.1)
-  )
-set.seed(646)
-bt <- bootstraps(iris, apparent = TRUE, times = 10000) %>%
+            mean(analysis(x)[["Sepal.Width"]], trim = 0.1))
+
+  set.seed(646)
+  bt <- bootstraps(iris, apparent = TRUE, times = 10000) %>%
   dplyr::mutate(tmean = get_tmean(splits))
-
-
-results <- rsample:::boot_ci_t(
-  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
-  var = "tmean",
-  alpha = 0.05,
-  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+  results <- rsample:::boot_ci_t(
+    bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+    var = "tmean",
+    alpha = 0.05,
+    theta_obs = bt %>% dplyr::filter(id == "Apparent")
 )
-
 
 
 # impute some missing values in iris
 test_that('upper & lower confidence interval does not contain NA', {
-  set.seed(646)
-  # create the messy `iris2` dataframe.
-  iris_na <-apply(iris, 2,
-              function(x) ifelse(runif(nrow(iris)) > 0.5, NA, x))
-  iris_na <- data.frame(iris_na)
 
-  # impute nas here
+  # iris_na <- apply(iris, 2,
+  #             function(x) ifelse(runif(nrow(iris)) > 0.5, NA, x))
+  iris_na<- iris
+  iris_na$Sepal.Width[c(1, 51, 101)] <- NA
+
+  set.seed(555)
   bt_na <- bootstraps(iris_na, apparent = TRUE, times = 10000) %>%
-    dplyr::mutate(tmean = get_tmean(splits))
+    dplyr::mutate(tmean = rep(NA_real_, 10001))
 
 
-  results_na <- rsample:::boot_ci_t(
-    bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
-    var = "tmean",
-    alpha = 0.05,
-    theta_obs = bt %>% dplyr::filter(id == "Apparent")
+  expect_error(
+    rsample:::boot_ci_t(
+      bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 0.05,
+      theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
+    )
   )
-  # missing bootsgrap stats, sgtill be able to compute the interval
-  # lower & upper shoudn't be na
-  expect_true(!is.na(results_na$lower))
-  expect_equal(sum(is.na(results_na)), 2)
-})
+  # expect_warning(theta_obs)
+  # expect_warning(theta_se)
 
+
+  #expect_true(is.na(results_na$lower))
+  #expect_true(is.na(results_na$upper))
+  # expect_equal(sum(is.na(results_na)), 2)
+})
 
 
 test_that('z_pntl has two unique values', {
   expect_false(results$lower == results$upper)
 })
-
 
 test_that('bt_resamples is a bootstrap object', {
   expect_equal(class(bt)[1], "bootstraps")
@@ -104,6 +83,26 @@ test_that('bt_resamples is a bootstrap object', {
 test_that('theta_obs is not NA', {
   expect_equal(sum(is.na(bt$tmean)), 0)
 })
+
+
+# ? check against random normal data and standard CI
+# how does this comparison look like?
+
+# EX
+
+# b = 10000
+# rnorm(500, 10, 1)
+# analytically you can track the mean
+# t.test
+# the mean
+# get p
+# expects_equal
+# within another tolerance
+# double precision
+# lower numerical tolearnce
+
+# expect_equivalent
+# looks at the values not the properties like rownames or colnames
 
 
 
