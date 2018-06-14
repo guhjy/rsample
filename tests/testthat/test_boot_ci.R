@@ -28,17 +28,17 @@ library(rsample)
   # how does this comparison look like?
   # EX
 # b=10000
-  # rnorm 500
+  # rnorm(500, 10, 1)
   # analyhtically tractically , mean
   # t.test
   # the mean
-  # get p\
+  # get p
   # expects_equal
   # within another tolerance
-  # diable doub,e precision
+  # diable double precision
   # lower numerical tolearnce
 
-  expect_equivalent
+  # expect_equivalent
   # looks at the values not the properties like rownames or colnames
 
   # bug
@@ -63,14 +63,32 @@ results <- rsample:::boot_ci_t(
 )
 
 
-# which dataframe is ocmplete?
-test_that('there is no missing data?', {
 
+# impute some missing values in iris
+test_that('upper & lower confidence interval does not contain NA', {
+  set.seed(646)
+  # create the messy `iris2` dataframe.
+  iris_na <-apply(iris, 2,
+              function(x) ifelse(runif(nrow(iris)) > 0.5, NA, x))
+  iris_na <- data.frame(iris_na)
+
+  # impute nas here
+  bt_na <- bootstraps(iris_na, apparent = TRUE, times = 10000) %>%
+    dplyr::mutate(tmean = get_tmean(splits))
+
+
+  results_na <- rsample:::boot_ci_t(
+    bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
+    var = "tmean",
+    alpha = 0.05,
+    theta_obs = bt %>% dplyr::filter(id == "Apparent")
+  )
+  # missing bootsgrap stats, sgtill be able to compute the interval
+  # lower & upper shoudn't be na
+  expect_true(!is.na(results_na$lower))
+  expect_equal(sum(is.na(results_na)), 2)
 })
 
-test_that('no missing values', {
-  expect_identical(testing_data, na.omit(testing_data))
-})
 
 
 test_that('z_pntl has two unique values', {
@@ -89,13 +107,15 @@ test_that('theta_obs is not NA', {
 
 
 
-#
-# test_that('missing data', {
-#
-# })
+
 #
 # test_that('all same estimates' , {
 #
+# })
+
+
+# test_that('no missing values', {
+#   expect_identical(testing_data, na.omit(testing_data))
 # })
 
 
