@@ -22,6 +22,17 @@ bt <- bootstraps(iris, apparent = TRUE, times = 10000) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
 
+test_that('bt_resamples is a bootstrap object', {
+  expect_equal(class(bt)[1], "bootstraps")
+})
+
+
+test_that('theta_obs is not NA', {
+  expect_equal(sum(is.na(bt$tmean)), 0)
+})
+
+
+
 #
 # test_that('missing data', {
 #
@@ -32,10 +43,3 @@ bt <- bootstraps(iris, apparent = TRUE, times = 10000) %>%
 # })
 
 
-
-test_that('theta_obs is not NA', {
-  expect_equal(sum(is.na(bt$tmean)), 0)
-})
-
-
-# test_that()
