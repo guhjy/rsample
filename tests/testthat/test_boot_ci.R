@@ -4,9 +4,19 @@ library(rsample)
 
 
 # things to check for:
+
 # ? missing data
- # Where do I care about missing data? bt?
-# ? all same estimates (as original boot package? that means the user has
+# Where do I care about missing data? bt?
+# original dataset has Nas
+
+# ? all same estimates
+# median with 10 data points
+# if they didn't generate enough B
+# num of unique datapoints
+# only one unique === FAILURE
+# stop divide by 0
+# hey all of your bootstrap estimates are the same
+# (as original boot package? that means the user has
 # to dowload it which is annoying --too bad for now I guess. I need the
 # straightforward benchmark that it provides.)
 
@@ -16,7 +26,23 @@ library(rsample)
 
 # ? check against rand normal data and standard CI
   # how does this comparison look like?
+  # EX
+# b=10000
+  # rnorm 500
+  # analyhtically tractically , mean
+  # t.test
+  # the mean
+  # get p\
+  # expects_equal
+  # within another tolerance
+  # diable doub,e precision
+  # lower numerical tolearnce
 
+  expect_equivalent
+  # looks at the values not the properties like rownames or colnames
+
+  # bug
+  # 2 tibbles -- look all counts the same but underlying is different
 
 
 get_tmean <- function(x)
