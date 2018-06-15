@@ -67,13 +67,27 @@ test_that('theta_obs is not NA', {
 })
 
 
-# ? check against random normal data and standard CI
-# test_that('Normally generated mean is in the ball-park of the bootstrap
-#           confidence interval or parameter estimate', {
-#   set.seed(888)
-#   norm_samples <- rnorm(n = 500, mean = 10, sd = 1)
-#   mean(norm_samples)
-#           })
+# check against random normal data and standard CI
+test_that(
+  'Normally generated mean is in the ball-park of the bootstrap
+  confidence interval or parameter estimate',
+  {
+    set.seed(888)
+    x <- rnorm(n = 500, mean = 10, sd = 1)
+    ttest <- t.test(x)
+    results_tdist<- ttest$conf.int[1:2]
+
+    bt_norm <- bootstraps(x, times = 10000, apparent = TRUE) %>%
+      dplyr::mutate(tmean = get_tmean(splits))
+
+    results_norm <- rsample:::boot_ci_t(
+      bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 0.05,
+      theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
+    )
+  }
+)
 
 # t.test
 # the mean
