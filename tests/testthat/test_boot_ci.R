@@ -1,7 +1,9 @@
 context("boot_ci")
-library(testthat)
 library(rsample)
+library(testthat)
 library(purrr)
+library(tibble)
+
 
 # things to check for:
 
@@ -10,20 +12,22 @@ library(purrr)
 # if they didn't generate enough B
 # num of unique datapoints
 # only one unique === FAILURE
-# stop divide by 0
+# x stop divide by 0
 
   # bug
   # 2 tibbles -- look all counts the same but underlying is different
 
 
+# Example Code --------------------------------------------------------
 get_tmean <- function(x)
   map_dbl(x,
           function(x)
             mean(analysis(x)[["Sepal.Width"]], trim = 0.1))
 
 set.seed(888)
-bt <- bootstraps(iris, apparent = TRUE, times = 10000) %>%
+bt <- bootstraps(iris, apparent = TRUE, times = 200) %>%
   dplyr::mutate(tmean = get_tmean(splits))
+
 results <- rsample:::boot_ci_t(
   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
   var = "tmean",
@@ -32,7 +36,42 @@ results <- rsample:::boot_ci_t(
 )
 
 
-# impute some missing values in iris
+# Sufficient Number of Bootstrap Resamples --------------------------------
+test_that("throw warning if theta_se equals 0 or infinity", {
+  set.seed(888)
+  bt <- bootstraps(iris, apparent = TRUE, times = 1) %>%
+    dplyr::mutate(tmean = get_tmean(splits))
+
+  expect_error(
+    rsample:::boot_ci_t(
+      bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 0.05,
+      theta_obs = bt %>% dplyr::filter(id == "Apparent")
+    )
+  )
+})
+
+test_that('z_pntl has two unique values', {
+  expect_false(results$lower == results$upper)
+})
+
+test_that('boostrap resample estimates are unique',{
+  times <- 1
+  bt_same <- bootstraps(iris, apparent = TRUE, times = times) %>%
+    dplyr::mutate(tmean = rep(3, times + 1))
+  expect_error(
+    rsample:::boot_ci_t(
+      bt_resamples = bt_same %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 0.05,
+      theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
+    )
+  )
+})
+
+
+# Prompt Errors: Too Many Missing Values ---------------------------------
 test_that('upper & lower confidence interval does not contain NA', {
   iris_na<- iris
   iris_na$Sepal.Width[c(1, 51, 101)] <- NA
@@ -51,57 +90,52 @@ test_that('upper & lower confidence interval does not contain NA', {
   )
 })
 
-
-test_that('z_pntl has two unique values', {
-  expect_false(results$lower == results$upper)
+test_that('theta_obs is not NA', {
+  expect_equal(sum(is.na(bt$tmean)), 0)
 })
-
 
 test_that('bt_resamples is a bootstrap object', {
   expect_equal(class(bt)[1], "bootstraps")
 })
 
 
-test_that('theta_obs is not NA', {
-  expect_equal(sum(is.na(bt$tmean)), 0)
-})
-
-
-# check against random normal data and standard CI
+# Check Against Standard Confidence Interval -----------------------------
 test_that(
-  'Normally generated mean is in the ball-park of the bootstrap
-  confidence interval or parameter estimate',
+  'Boostrap estimate of mean is close to estimate of mean from normal distribution',
   {
     set.seed(888)
-    x <- rnorm(n = 500, mean = 10, sd = 1)
-    ttest <- t.test(x)
-    results_tdist<- ttest$conf.int[1:2]
+    n <- 10
+    mean <- 10
+    sd <- 1
 
-    bt_norm <- bootstraps(x, times = 10000, apparent = TRUE) %>%
+    rand_nums <- rnorm(n, mean, sd)
+    x <- as.data.frame(rand_nums)
+
+    ttest <- t.test(x)
+    results_ttest <- tibble(
+      lower = ttest$conf.int[1],
+      upper = ttest$conf.int[2],
+      alpha = 0.05,
+      method = "bootstrap-t"
+    )
+
+
+    get_tmean <- function(y)
+      map_dbl(y,
+              function(y)
+                mean(analysis(y)[["rand_nums"]], na.rm = TRUE))
+
+    bt_norm <- bootstraps(x, times = 25, apparent = TRUE) %>%
       dplyr::mutate(tmean = get_tmean(splits))
 
-    results_norm <- rsample:::boot_ci_t(
+    results_boot <- rsample:::boot_ci_t(
       bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
       var = "tmean",
       alpha = 0.05,
       theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
     )
+
+      expect_equal(results_ttest$lower, results_boot$lower, tolerance = sd)
+      expect_equal(results_ttest$upper, results_boot$upper, tolerance = sd)
   }
 )
-
-# t.test
-# the mean
-# get p
-# expects_equal
-# within another tolerance
-# double precision
-# lower numerical tolearnce
-
-# expect_equivalent
-# looks at the values not the properties like rownames or colnames
-
-
-#
-# test_that('all same estimates' , {
-#
-# })
