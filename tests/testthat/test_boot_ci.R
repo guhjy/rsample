@@ -70,7 +70,6 @@ test_that('boostrap resample estimates are unique',{
   )
 })
 
-
 # Prompt Errors: Too Many Missing Values ---------------------------------
 test_that('upper & lower confidence interval does not contain NA', {
   iris_na<- iris
