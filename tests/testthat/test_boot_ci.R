@@ -36,7 +36,7 @@ results <- rsample:::boot_ci_t(
 )
 
 
-# Sufficient Number of Bootstrap Resamples --------------------------------
+context("boot_ci: Sufficient Number of Bootstrap Resamples")
 test_that("throw warning if theta_se equals 0 or infinity", {
   set.seed(888)
   bt <- bootstraps(iris, apparent = TRUE, times = 1) %>%
@@ -71,7 +71,7 @@ test_that('boostrap resample estimates are unique',{
 })
 
 
-# Prompt Errors: Too Many Missing Values ---------------------------------
+context("boot_ci Prompt Errors: Too Many Missing Values")
 test_that('upper & lower confidence interval does not contain NA', {
   iris_na<- iris
   iris_na$Sepal.Width[c(1, 51, 101)] <- NA
@@ -99,12 +99,12 @@ test_that('bt_resamples is a bootstrap object', {
 })
 
 
-# Check Against Standard Confidence Interval -----------------------------
+context("boot_ci Check Against Standard Confidence Interval")
 test_that(
   'Boostrap estimate of mean is close to estimate of mean from normal distribution',
   {
     set.seed(888)
-    n <- 10
+    n <- 10000
     mean <- 10
     sd <- 1
 
@@ -119,14 +119,13 @@ test_that(
       method = "bootstrap-t"
     )
 
-
-    get_tmean <- function(y)
+    get_mean <- function(y)
       map_dbl(y,
               function(y)
                 mean(analysis(y)[["rand_nums"]], na.rm = TRUE))
 
-    bt_norm <- bootstraps(x, times = 25, apparent = TRUE) %>%
-      dplyr::mutate(tmean = get_tmean(splits))
+    bt_norm <- bootstraps(x, times = 500, apparent = TRUE) %>%
+      dplyr::mutate(tmean = get_mean(splits))
 
     results_boot <- rsample:::boot_ci_t(
       bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
@@ -135,7 +134,7 @@ test_that(
       theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
     )
 
-      expect_equal(results_ttest$lower, results_boot$lower, tolerance = sd)
-      expect_equal(results_ttest$upper, results_boot$upper, tolerance = sd)
+      expect_equal(results_ttest$lower, results_boot$lower, tolerance = 0.01)
+      expect_equal(results_ttest$upper, results_boot$upper, tolerance = 0.01)
   }
 )
