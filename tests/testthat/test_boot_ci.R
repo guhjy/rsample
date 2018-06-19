@@ -110,6 +110,18 @@ test_that('bt_resamples is a bootstrap object', {
 })
 
 
+test_that('alpha is a reasonable level of significance', {
+  expect_error(
+    rsample:::boot_ci_perc(
+      bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 5,
+      theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
+    )
+  )
+})
+
+
 # Check Against Standard Confidence Interval -----------------------------
 test_that(
   'Boostrap estimate of mean is close to estimate of mean from normal distribution',

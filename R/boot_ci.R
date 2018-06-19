@@ -33,9 +33,8 @@ boot_ci_perc <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
   if (all(is.na(z_dist)))
   stop("All statistics (z_dist) are missing values.", call. = FALSE)
 
-  # then write a test case for that
-  #if (theta_obs == (0 | Inf))
-  #stop("Your standard error (theta_obs) is 0 or infinity.", call. = FALSE)
+  if (0<alpha && alpha>1)
+  stop("Your significance level (alpha) is unreasonable.", call. = FALSE)
 
   ci <- quantile(z_dist, probs = c(alpha/2, 1-alpha/2), na.rm = TRUE)
   tibble(
