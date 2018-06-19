@@ -63,14 +63,14 @@ test_that('bootstrap resample estimates are unique',{
       theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
     )
   )
-  expect_error(
-    rsample:::boot_ci_perc(
-      bt_resamples = bt_same %>% dplyr::filter(id != "Apparent"),
-      var = "tmean",
-      alpha = 0.05,
-      theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
-    )
-  )
+  # expect_error(
+  #   rsample:::boot_ci_perc(
+  #     bt_resamples = bt_same %>% dplyr::filter(id != "Apparent"),
+  #     var = "tmean",
+  #     alpha = 0.05,
+  #     theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
+  #   )
+  # )
 })
 
 # Prompt Errors: Too Many Missing Values ---------------------------------
@@ -90,6 +90,15 @@ test_that('upper & lower confidence interval does not contain NA', {
       theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
     )
   )
+  expect_error(
+    rsample:::boot_ci_perc(
+      bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 0.05,
+      theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
+    )
+  )
+
 })
 
 test_that('theta_obs is not NA', {
