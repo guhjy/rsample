@@ -5,19 +5,6 @@ library(purrr)
 library(tibble)
 
 
-# things to check for:
-
-# ? all same estimates
-# median with 10 data points
-# if they didn't generate enough B
-# num of unique datapoints
-# only one unique === FAILURE
-# x stop divide by 0
-
-  # bug
-  # 2 tibbles -- look all counts the same but underlying is different
-
-
 # Example Code --------------------------------------------------------
 get_tmean <- function(x)
   map_dbl(x,
@@ -29,6 +16,13 @@ bt <- bootstraps(iris, apparent = TRUE, times = 200) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
 results <- rsample:::boot_ci_t(
+  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+  var = "tmean",
+  alpha = 0.05,
+  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+)
+
+results_percentile <- rsample:::boot_ci_perc(
   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
   var = "tmean",
   alpha = 0.05,
