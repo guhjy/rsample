@@ -12,9 +12,11 @@ get_tmean <- function(x)
             mean(analysis(x)[["Sepal.Width"]], trim = 0.1))
 
 set.seed(888)
-bt_one <- bootstraps(iris, apparent = TRUE, times = 10) %>%
+bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
+bt <- bootstraps(iris, apparent = TRUE, times = 5) %>%
+  dplyr::mutate(tmean = get_tmean(splits))
 
 results <- rsample:::boot_ci_t(
   bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
@@ -37,13 +39,32 @@ results_percentile <- rsample:::boot_ci_perc(
 #   theta_obs = bt %>% dplyr::filter(id == "Apparent")
 # )
 
-# test
-# map_dbl(bt$splits, function(x){
-#   # dat <- as.data.frame(x)$Sepal.Width
-#   # stuff <- as.data.frame(x)
-#   # print(length(stuff))
-#   print(x)
-# })
+
+# Test - Obtain apparent resample: iris$Sepal.Width ---------------------------
+iris2 <- iris[1:130, ]
+# iris2$Species[1:3]
+set.seed(13)
+resample1 <- bootstraps(iris2, times = 3)
+map_dbl(resample1$splits,
+        function(x) {
+          # analysis(x)
+          # dat <- as.data.frame(x)$Species
+          # dat
+          # length(dat)
+          # names(dat)
+          # colnames(dat)
+          # mean(dat == "virginica")
+        })
+#> [1] 0.2000000 0.2461538 0.2230769
+
+
+# map_dbl(bt$splits, print)
+map_dbl(bt$splits, function(x){
+  dat <- as.data.frame(x)$Sepal.Width
+  # stuff <- as.data.frame(x)
+  # print(length(stuff))
+  print(dat)
+})
 
 
 

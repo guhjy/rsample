@@ -56,6 +56,8 @@ boot_ci_bca <- function(bt_resamples, var, alpha, data = NULL, theta_obs){
   Z0 = qnorm(po)
   Za = qnorm(1-alpha/2)
 
+  # Process apparent resample here ?
+
   leave_one_out_theta = sapply(1:length(theta_obs), function(i){
     leave_out_data = data[-i] # leave out the ith observation
     theta_i = mean(leave_out_data)
