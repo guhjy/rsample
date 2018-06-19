@@ -20,37 +20,58 @@ bt <- bootstraps(iris, apparent = TRUE, times = 5) %>%
 
 results <- rsample:::boot_ci_t(
   bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
-  var = "tmean",
+  stat = "tmean",
   alpha = 0.05,
   theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
 )
 
+results_t <- rsample:::boot_ci_t(
+  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+  stat = "tmean",
+  alpha = 0.05,
+  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+)
+
 results_percentile <- rsample:::boot_ci_perc(
   bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
-  var = "tmean",
+  stat = "tmean",
   alpha = 0.05,
   theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
 )
 
 # results_bca <- rsample:::boot_ci_bca(
 #   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
-#   var = "tmean",
+#   stat = "tmean",
 #   alpha = 0.05,
 #   theta_obs = bt %>% dplyr::filter(id == "Apparent")
 # )
 
 
+
+
+
 # Test - Obtain apparent resample: iris$Sepal.Width ---------------------------
+# results_t
+#bt_resamples <- bt %>% dplyr::filter(id != "Apparent")
+#bt_resamples
+theta_obs <- bt %>% dplyr::filter(id == "Apparent")
+
+# put this in bca function within `boot_ci.R`
+apparent_sample <- theta_obs$splits[[1]]
+dat <- analysis(apparent_sample)
+dat
+
 iris2 <- iris[1:130, ]
 # iris2$Species[1:3]
 set.seed(13)
-resample1 <- bootstraps(iris2, times = 3)
-map_dbl(resample1$splits,
+resample1 <- bootstraps(iris2, times = 3, apparent = TRUE)
+resample1 %>%
+map(resample1$splits,
         function(x) {
           # analysis(x)
-          # dat <- as.data.frame(x)$Species
+          dat <- as.data.frame(x)$Species
           # dat
-          # length(dat)
+          length(dat)
           # names(dat)
           # colnames(dat)
           # mean(dat == "virginica")
@@ -77,7 +98,7 @@ test_that("throw warning if theta_se equals 0 or infinity", {
   expect_error(
     rsample:::boot_ci_t(
       bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
-      var = "tmean",
+      stat = "tmean",
       alpha = 0.05,
       theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
     )
@@ -96,7 +117,7 @@ test_that('bootstrap resample estimates are unique',{
   expect_error(
     rsample:::boot_ci_t(
       bt_resamples = bt_same %>% dplyr::filter(id != "Apparent"),
-      var = "tmean",
+      stat = "tmean",
       alpha = 0.05,
       theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
     )
@@ -116,7 +137,7 @@ test_that('upper & lower confidence interval does not contain NA', {
   expect_error(
     rsample:::boot_ci_t(
       bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
-      var = "tmean",
+      stat = "tmean",
       alpha = 0.05,
       theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
     )
@@ -124,7 +145,7 @@ test_that('upper & lower confidence interval does not contain NA', {
   expect_error(
     rsample:::boot_ci_perc(
       bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
-      var = "tmean",
+      stat = "tmean",
       alpha = 0.05,
       theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
     )
@@ -145,7 +166,7 @@ test_that('alpha is a reasonable level of significance', {
   expect_error(
     rsample:::boot_ci_perc(
       bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
-      var = "tmean",
+      stat = "tmean",
       alpha = 5,
       theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
     )
@@ -183,7 +204,7 @@ test_that(
 
     results_boot <- rsample:::boot_ci_t(
       bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
-      var = "tmean",
+      stat = "tmean",
       alpha = 0.05,
       theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
     )
