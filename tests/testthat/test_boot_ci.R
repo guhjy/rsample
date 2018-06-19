@@ -12,36 +12,53 @@ get_tmean <- function(x)
             mean(analysis(x)[["Sepal.Width"]], trim = 0.1))
 
 set.seed(888)
-bt <- bootstraps(iris, apparent = TRUE, times = 200) %>%
+bt_one <- bootstraps(iris, apparent = TRUE, times = 10) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
+
 results <- rsample:::boot_ci_t(
-  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+  bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
   var = "tmean",
   alpha = 0.05,
-  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+  theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
 )
 
 results_percentile <- rsample:::boot_ci_perc(
-  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+  bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
   var = "tmean",
   alpha = 0.05,
-  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+  theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
 )
+
+# results_bca <- rsample:::boot_ci_bca(
+#   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+#   var = "tmean",
+#   alpha = 0.05,
+#   theta_obs = bt %>% dplyr::filter(id == "Apparent")
+# )
+
+# test
+# map_dbl(bt$splits, function(x){
+#   # dat <- as.data.frame(x)$Sepal.Width
+#   # stuff <- as.data.frame(x)
+#   # print(length(stuff))
+#   print(x)
+# })
+
 
 
 context("boot_ci: Sufficient Number of Bootstrap Resamples")
 test_that("throw warning if theta_se equals 0 or infinity", {
   set.seed(888)
-  bt <- bootstraps(iris, apparent = TRUE, times = 1) %>%
+  bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
     dplyr::mutate(tmean = get_tmean(splits))
 
   expect_error(
     rsample:::boot_ci_t(
-      bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+      bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
       var = "tmean",
       alpha = 0.05,
-      theta_obs = bt %>% dplyr::filter(id == "Apparent")
+      theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
     )
   )
 })
@@ -95,11 +112,11 @@ test_that('upper & lower confidence interval does not contain NA', {
 })
 
 test_that('theta_obs is not NA', {
-  expect_equal(sum(is.na(bt$tmean)), 0)
+  expect_equal(sum(is.na(bt_one$tmean)), 0)
 })
 
 test_that('bt_resamples is a bootstrap object', {
-  expect_equal(class(bt)[1], "bootstraps")
+  expect_equal(class(bt_one)[1], "bootstraps")
 })
 
 
