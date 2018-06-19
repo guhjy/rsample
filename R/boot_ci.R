@@ -28,8 +28,8 @@ boot_ci_t <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
 }
 
 boot_ci_perc <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
-  theta_obs <- theta_obs[[var]]
-  ci <- quantile(theta_obs, probs = c(alpha/2, 1-alpha/2), na.rm = TRUE)
+  z_dist <- bt_resamples[[var]]
+  ci <- quantile(z_dist, probs = c(alpha/2, 1-alpha/2), na.rm = TRUE)
   tibble(
     lower = ci[1],
     upper = ci[2],

@@ -44,10 +44,12 @@ test_that("throw warning if theta_se equals 0 or infinity", {
       theta_obs = bt %>% dplyr::filter(id == "Apparent")
     )
   )
+
 })
 
 test_that('z_pntl has two unique values', {
   expect_false(results$lower == results$upper)
+  expect_false(results_percentile$lower == results_percentile$upper)
 })
 
 test_that('boostrap resample estimates are unique',{
