@@ -39,14 +39,13 @@ results_percentile <- rsample:::boot_ci_perc(
   theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
 )
 
-# results_bca <- rsample:::boot_ci_bca(
-#   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
-#   stat = "tmean",
-#   alpha = 0.05,
-#   theta_obs = bt %>% dplyr::filter(id == "Apparent")
-# )
-
-
+results_bca <- rsample:::boot_ci_bca(
+  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+  stat = "tmean",
+  alpha = 0.05,
+  var = "Sepal.Width",
+  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+)
 
 
 
@@ -54,24 +53,25 @@ results_percentile <- rsample:::boot_ci_perc(
 # results_t
 #bt_resamples <- bt %>% dplyr::filter(id != "Apparent")
 #bt_resamples
-theta_obs <- bt %>% dplyr::filter(id == "Apparent")
-
-# put this in bca function within `boot_ci.R`
-apparent_sample <- theta_obs$splits[[1]]
-dat <- analysis(apparent_sample)
-dat
-
-iris2 <- iris[1:130, ]
-# iris2$Species[1:3]
-set.seed(13)
-resample1 <- bootstraps(iris2, times = 3, apparent = TRUE)
-resample1 %>%
-map(resample1$splits,
-        function(x) {
-          # analysis(x)
-          dat <- as.data.frame(x)$Species
-          # dat
-          length(dat)
+# theta_obs <- bt %>% dplyr::filter(id == "Apparent")
+#
+# # # put this in bca function within `boot_ci.R`
+# # apparent_sample <- theta_obs$splits[[1]]
+# # dat <- analysis(apparent_sample)
+# var <- "Sepal.Width"
+# # dat[[var]]
+#
+# iris2 <- iris[1:130, ]
+# # iris2$Species[1:3]
+# set.seed(13)
+# resample1 <- bootstraps(iris2, times = 3, apparent = TRUE)
+# resample1 %>%
+# map(resample1$splits,
+#         function(x) {
+#           # analysis(x)
+#           dat <- as.data.frame(x)$Species
+#           # dat
+#           length(dat)
           # names(dat)
           # colnames(dat)
           # mean(dat == "virginica")
@@ -79,14 +79,14 @@ map(resample1$splits,
 #> [1] 0.2000000 0.2461538 0.2230769
 
 
-# map_dbl(bt$splits, print)
-map_dbl(bt$splits, function(x){
-  dat <- as.data.frame(x)$Sepal.Width
-  # stuff <- as.data.frame(x)
-  # print(length(stuff))
-  print(dat)
-})
-
+# # map_dbl(bt$splits, print)
+# map_dbl(bt$splits, function(x){
+#   dat <- as.data.frame(x)$Sepal.Width
+#   # stuff <- as.data.frame(x)
+#   # print(length(stuff))
+#   print(dat)
+# })
+#
 
 
 context("boot_ci: Sufficient Number of Bootstrap Resamples")

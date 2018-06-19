@@ -47,7 +47,12 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
 
 
 # TO-DO return tibble with upper lower alpha
-boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL, theta_obs){
+boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
+
+  # Process apparent resample here
+  apparent_sample <- theta_obs$splits[[1]]
+  dat <- analysis(apparent_sample)
+  dat[[var]]
 
   theta_hat <- mean(bt_resamples[[stat]])
 
@@ -55,8 +60,6 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL, theta_obs){
   po <- mean(theta_obs[[stat]] <= theta_hat)
   Z0 = qnorm(po)
   Za = qnorm(1-alpha/2)
-
-  # Process apparent resample here ?
 
   leave_one_out_theta = sapply(1:length(theta_obs), function(i){
     leave_out_data = data[-i] # leave out the ith observation
