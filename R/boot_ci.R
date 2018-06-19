@@ -27,6 +27,24 @@ boot_ci_t <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
   )
 }
 
+boot_ci_perc <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
+  z_dist <- bt_resamples[[var]]
+
+  if (all(is.na(z_dist)))
+  stop("All statistics (z_dist) are missing values.", call. = FALSE)
+
+  if (0<alpha && alpha>1)
+  stop("Your significance level (alpha) is unreasonable.", call. = FALSE)
+
+  ci <- quantile(z_dist, probs = c(alpha/2, 1-alpha/2), na.rm = TRUE)
+  tibble(
+    lower = ci[1],
+    upper = ci[2],
+    alpha = alpha,
+    method = "percentile"
+  )
+}
+
 
 
 

@@ -5,19 +5,6 @@ library(purrr)
 library(tibble)
 
 
-# things to check for:
-
-# ? all same estimates
-# median with 10 data points
-# if they didn't generate enough B
-# num of unique datapoints
-# only one unique === FAILURE
-# x stop divide by 0
-
-  # bug
-  # 2 tibbles -- look all counts the same but underlying is different
-
-
 # Example Code --------------------------------------------------------
 get_tmean <- function(x)
   map_dbl(x,
@@ -29,6 +16,13 @@ bt <- bootstraps(iris, apparent = TRUE, times = 200) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
 results <- rsample:::boot_ci_t(
+  bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
+  var = "tmean",
+  alpha = 0.05,
+  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+)
+
+results_percentile <- rsample:::boot_ci_perc(
   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
   var = "tmean",
   alpha = 0.05,
@@ -54,9 +48,10 @@ test_that("throw warning if theta_se equals 0 or infinity", {
 
 test_that('z_pntl has two unique values', {
   expect_false(results$lower == results$upper)
+  expect_false(results_percentile$lower == results_percentile$upper)
 })
 
-test_that('boostrap resample estimates are unique',{
+test_that('bootstrap resample estimates are unique',{
   times <- 1
   bt_same <- bootstraps(iris, apparent = TRUE, times = times) %>%
     dplyr::mutate(tmean = rep(3, times + 1))
@@ -68,6 +63,14 @@ test_that('boostrap resample estimates are unique',{
       theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
     )
   )
+  # expect_error(
+  #   rsample:::boot_ci_perc(
+  #     bt_resamples = bt_same %>% dplyr::filter(id != "Apparent"),
+  #     var = "tmean",
+  #     alpha = 0.05,
+  #     theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
+  #   )
+  # )
 })
 
 
@@ -88,6 +91,15 @@ test_that('upper & lower confidence interval does not contain NA', {
       theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
     )
   )
+  expect_error(
+    rsample:::boot_ci_perc(
+      bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 0.05,
+      theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
+    )
+  )
+
 })
 
 test_that('theta_obs is not NA', {
@@ -96,6 +108,18 @@ test_that('theta_obs is not NA', {
 
 test_that('bt_resamples is a bootstrap object', {
   expect_equal(class(bt)[1], "bootstraps")
+})
+
+
+test_that('alpha is a reasonable level of significance', {
+  expect_error(
+    rsample:::boot_ci_perc(
+      bt_resamples = bt_na %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 5,
+      theta_obs = bt_na %>% dplyr::filter(id == "Apparent")
+    )
+  )
 })
 
 
