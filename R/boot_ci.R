@@ -28,6 +28,13 @@ boot_ci_t <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
 }
 
 boot_ci_perc <- function(bt_resamples, var, alpha, data = NULL, theta_obs) {
+  if (all(is.na(theta_obs)))
+  stop("All statistics (theta_obs) are missing values.", call. = FALSE)
+
+  # then write a test case for that
+  #if (theta_se == (0 | Inf))
+  #stop("Your standard error (theta_se) is 0 or infinity.", call. = FALSE)
+
   z_dist <- bt_resamples[[var]]
   ci <- quantile(z_dist, probs = c(alpha/2, 1-alpha/2), na.rm = TRUE)
   tibble(

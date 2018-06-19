@@ -44,7 +44,6 @@ test_that("throw warning if theta_se equals 0 or infinity", {
       theta_obs = bt %>% dplyr::filter(id == "Apparent")
     )
   )
-
 })
 
 test_that('z_pntl has two unique values', {
@@ -52,12 +51,20 @@ test_that('z_pntl has two unique values', {
   expect_false(results_percentile$lower == results_percentile$upper)
 })
 
-test_that('boostrap resample estimates are unique',{
+test_that('bootstrap resample estimates are unique',{
   times <- 1
   bt_same <- bootstraps(iris, apparent = TRUE, times = times) %>%
     dplyr::mutate(tmean = rep(3, times + 1))
   expect_error(
     rsample:::boot_ci_t(
+      bt_resamples = bt_same %>% dplyr::filter(id != "Apparent"),
+      var = "tmean",
+      alpha = 0.05,
+      theta_obs = bt_same %>% dplyr::filter(id == "Apparent")
+    )
+  )
+  expect_error(
+    rsample:::boot_ci_perc(
       bt_resamples = bt_same %>% dplyr::filter(id != "Apparent"),
       var = "tmean",
       alpha = 0.05,
