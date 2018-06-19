@@ -15,7 +15,7 @@ set.seed(888)
 bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
-bt <- bootstraps(iris, apparent = TRUE, times = 5) %>%
+bt <- bootstraps(iris, apparent = TRUE, times = 500) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
 results <- rsample:::boot_ci_t(
@@ -46,47 +46,6 @@ results_bca <- rsample:::boot_ci_bca(
   var = "Sepal.Width",
   theta_obs = bt %>% dplyr::filter(id == "Apparent")
 )
-
-
-
-# Test - Obtain apparent resample: iris$Sepal.Width ---------------------------
-# results_t
-#bt_resamples <- bt %>% dplyr::filter(id != "Apparent")
-#bt_resamples
-# theta_obs <- bt %>% dplyr::filter(id == "Apparent")
-#
-# # # put this in bca function within `boot_ci.R`
-# # apparent_sample <- theta_obs$splits[[1]]
-# # dat <- analysis(apparent_sample)
-# var <- "Sepal.Width"
-# # dat[[var]]
-#
-# iris2 <- iris[1:130, ]
-# # iris2$Species[1:3]
-# set.seed(13)
-# resample1 <- bootstraps(iris2, times = 3, apparent = TRUE)
-# resample1 %>%
-# map(resample1$splits,
-#         function(x) {
-#           # analysis(x)
-#           dat <- as.data.frame(x)$Species
-#           # dat
-#           length(dat)
-          # names(dat)
-          # colnames(dat)
-          # mean(dat == "virginica")
-        })
-#> [1] 0.2000000 0.2461538 0.2230769
-
-
-# # map_dbl(bt$splits, print)
-# map_dbl(bt$splits, function(x){
-#   dat <- as.data.frame(x)$Sepal.Width
-#   # stuff <- as.data.frame(x)
-#   # print(length(stuff))
-#   print(dat)
-# })
-#
 
 
 context("boot_ci: Sufficient Number of Bootstrap Resamples")

@@ -4,7 +4,7 @@
 \alias{boot_ci_t}
 \title{Bootstrap Confidence Intervals}
 \usage{
-boot_ci_t(bt_resamples, var, alpha, data = NULL, theta_obs)
+boot_ci_t(bt_resamples, stat, alpha, data = NULL, theta_obs)
 }
 \description{
 Bootstrap Confidence Intervals
