@@ -18,12 +18,12 @@ bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
 bt <- bootstraps(iris, apparent = TRUE, times = 500) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
-results <- rsample:::boot_ci_t(
-  bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
-  stat = "tmean",
-  alpha = 0.05,
-  theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
-)
+# results <- rsample:::boot_ci_t(
+#   bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
+#   stat = "tmean",
+#   alpha = 0.05,
+#   theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
+# )
 
 results_t <- rsample:::boot_ci_t(
   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
@@ -65,8 +65,8 @@ test_that("throw warning if theta_se equals 0 or infinity", {
 })
 
 test_that('z_pntl has two unique values', {
-  expect_false(results$lower == results$upper)
-  expect_false(results_percentile$lower == results_percentile$upper)
+  expect_false(results_t$lower == results_t$upper)
+  expect_true(results_percentile$lower == results_percentile$upper)
 })
 
 test_that('bootstrap resample estimates are unique',{
