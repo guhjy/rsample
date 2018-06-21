@@ -68,17 +68,100 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   return(theta_i)    # returns a vector of means. mean of each bootstrap resample.
   })
 
-  loo_resamples <- loo_cv(data) %>%
-    mutate(loo_analysis_resample = map(analysis(splits))
-    # mutate(theta_i = map_dbl(splits, get_mean))
+
+# Yet another abysmal start -----------------------------------------------
+  # start over!!
+
+  # run this again
+  #bt <- bootstraps(iris, apparent = TRUE, times = 500) %>%
+  #dplyr::mutate(tmean = get_tmean(splits))
+
+  # run parts inside the function
+ # results_bca <- rsample:::boot_ci_bca(
+  bt_resamples = bt %>% dplyr::filter(id != "Apparent")
+  stat = "tmean"
+  alpha = 0.05
+  var = "Sepal.Width"
+  theta_obs = bt %>% dplyr::filter(id == "Apparent")
+#)
+
+  # Process apparent resample
+  apparent_sample <- theta_obs$splits[[1]]
+  dat <- analysis(apparent_sample)
+  data <- as.data.frame(dat[[var]])
+    # now data looks like a df with a single var called dat[[var]]
+
+  # pass the original data into loo_cv to generate LOO resamples
+  loo_resamples <- loo_cv(data)
 
 
 
-  many_analysis <- lapply(loo_resamples$splits, analysis)
+  # GENERATE ONE RESAMPLE FIRST
+  loo_one_resample <- loo_resamples$splits[[1]]
+  loo_one_resample_data <- analysis(loo_one_resample)
+
+  nrow(loo_one_resample_data)  # 150 original data entries - 1 = 149
+  str(loo_one_resample_data) # data.frame object means you have to subset out var of interest
+  theta_one_resample_data <- mean(loo_one_resample_data[["dat[[var]]"]])
+
+  # compile all the steps above without intermediate variables
+  loo_results <- loo_cv(data) %>%
+    mutate(theta_i = get_theta_i(splits))
+
+  loo_results
+
+  get_theta_i <- function(x)
+    map_dbl(x,
+            function(x)
+              mean(analysis(x)[["dat[[var]]"]]))
+
+
+
+    #analysis(pluck('splits'))
+  class(loo_results)
+  str(loo_results)
+    # mutate(stuff = map_data(analysis(splits)))
+
+# inspo
+bt_sample_size <- map_dbl(bt_resamples$splits, get_mean)
+
+# inspo
+get_mean <- function(split, ...) {
+  bt_samp <- analysis(split)
+  theta_i <- mean(bt_samp[["data"]])
+  return(theta_i)
+}
+
+
+
+  # now repeat the above process for all the data
+
+
+  # theta_hat <- mean(bt_resamples[[stat]])
+
+
+
+    #mutate(loo_analysis_resample = map(analysis(splits))
+
+# mutate(theta_i = map_dbl(splits, get_mean))
+
+
+
+#  many_analysis <- lapply(loo_resamples$splits, analysis)
 
 
   loo_analysis <- analysis(loo_resamples$splits[[1]])
+
+  str(loo_analysis)
+  str(data)
+  colnames(data)
+  colnames(loo_analysis)
+
+  loo_analysis[[]]
+
+  mean(loo_analysis)
   mean(loo_analysis[["data"]])
+
   loo_mean <- map_dbl(loo_resamples$splits, get_mean)
 
 
