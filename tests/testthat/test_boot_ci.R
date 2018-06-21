@@ -18,6 +18,7 @@ bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
 bt <- bootstraps(iris, apparent = TRUE, times = 500) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
+# TODO sort out difference in test results between results & results_t
 # results <- rsample:::boot_ci_t(
 #   bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
 #   stat = "tmean",
@@ -161,14 +162,27 @@ test_that(
     bt_norm <- bootstraps(x, times = 500, apparent = TRUE) %>%
       dplyr::mutate(tmean = get_mean(splits))
 
-    results_boot <- rsample:::boot_ci_t(
+    results_boot_t <- rsample:::boot_ci_t(
       bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
       stat = "tmean",
       alpha = 0.05,
       theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
     )
 
-      expect_equal(results_ttest$lower, results_boot$lower, tolerance = 0.01)
-      expect_equal(results_ttest$upper, results_boot$upper, tolerance = 0.01)
+    # TODO run BCa tests once satisfied with function
+    # results_boot_bca <- rsample:::boot_ci_bca(
+    #   bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
+    #   stat = "tmean",
+    #   alpha = 0.05,
+    #   theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
+    # )
+
+
+      expect_equal(results_ttest$lower, results_boot_t$lower, tolerance = 0.01)
+      expect_equal(results_ttest$upper, results_boot_t$upper, tolerance = 0.01)
+      # expect_equal(results_ttest$lower, results_boot_bca$lower, tolerance = 0.01)
+      # expect_equal(results_ttest$upper, results_boot_bca$upper, tolerance = 0.01)
+      #
+
   }
 )
