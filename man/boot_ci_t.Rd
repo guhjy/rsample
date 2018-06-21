@@ -7,5 +7,6 @@
 boot_ci_t(bt_resamples, stat, alpha, data = NULL, theta_obs)
 }
 \description{
-Bootstrap Confidence Intervals
+@importFrom dplyr mutate
+ @importFrom stats sd
 }
