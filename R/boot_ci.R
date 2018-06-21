@@ -76,7 +76,6 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   leave_one_out_theta <- loo_cv(data) %>%
     mutate(theta_i = get_theta_i(splits))
 
-
   theta_minus_one = mean(leave_one_out_theta$theta_i)
   a = sum( (theta_minus_one - leave_one_out_theta$theta_i)^3)/( 6 *(sum( (theta_minus_one - leave_one_out_theta$theta_i)^2))^(3/2) )
 

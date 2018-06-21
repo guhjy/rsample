@@ -137,7 +137,7 @@ test_that('alpha is a reasonable level of significance', {
 
 context("boot_ci Check Against Standard Confidence Interval")
 test_that(
-  'Boostrap estimate of mean is close to estimate of mean from normal distribution',
+  'Bootstrap estimate of mean is close to estimate of mean from normal distribution',
   {
     set.seed(888)
     n <- 10000
@@ -170,20 +170,24 @@ test_that(
       theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
     )
 
-    # TODO run BCa tests once satisfied with function
-    # results_boot_bca <- rsample:::boot_ci_bca(
-    #   bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
-    #   stat = "tmean",
-    #   alpha = 0.05,
-    #   theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
-    # )
+    results_boot_bca <- rsample:::boot_ci_bca(
+      bt_resamples = bt_norm %>% dplyr::filter(id != "Apparent"),
+      stat = "tmean",
+      alpha = 0.05,
+      var = "rand_nums",
+      theta_obs = bt_norm %>% dplyr::filter(id == "Apparent")
+    )
 
 
       expect_equal(results_ttest$lower, results_boot_t$lower, tolerance = 0.01)
       expect_equal(results_ttest$upper, results_boot_t$upper, tolerance = 0.01)
-      # expect_equal(results_ttest$lower, results_boot_bca$lower, tolerance = 0.01)
-      # expect_equal(results_ttest$upper, results_boot_bca$upper, tolerance = 0.01)
-      #
+      expect_equal(results_ttest$lower, results_boot_bca$lower, tolerance = 0.01)
+      expect_equal(results_ttest$upper, results_boot_bca$upper, tolerance = 0.01)
 
   }
 )
+
+# TODO test for sufficient number of bootstrap replications
+# test_that("At least B=1000 replications needed to reduce Monte Carlo sampling Error for BCa method",{
+#   expect_equal()
+# })
