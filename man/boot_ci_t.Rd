@@ -2,11 +2,16 @@
 % Please edit documentation in R/boot_ci.R
 \name{boot_ci_t}
 \alias{boot_ci_t}
-\title{Bootstrap Confidence Intervals}
+\title{Bootstrap Confidence Intervals
+ @importFrom dplyr mutate
+ @importFrom stats sd
+ @export}
 \usage{
 boot_ci_t(bt_resamples, stat, alpha, data = NULL, theta_obs)
 }
 \description{
-@importFrom dplyr mutate
+Bootstrap Confidence Intervals
+ @importFrom dplyr mutate
  @importFrom stats sd
+ @export
 }

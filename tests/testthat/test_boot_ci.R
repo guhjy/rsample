@@ -3,6 +3,7 @@ library(rsample)
 library(testthat)
 library(purrr)
 library(tibble)
+library(dplyr)
 
 
 # Example Code --------------------------------------------------------

@@ -1,8 +1,7 @@
 #' Bootstrap Confidence Intervals
-#'
 #'  @importFrom dplyr mutate
 #'  @importFrom stats sd
-#' @export
+#'  @export
 boot_ci_t <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
 
   theta_obs <- theta_obs[[stat]]
@@ -79,7 +78,7 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
 
 
   theta_minus_one = mean(leave_one_out_theta$theta_i)
-  a = sum( (theta_minus_one - leave_one_out_theta)^3)/( 6 *(sum( (theta_minus_one - leave_one_out_theta)^2))^(3/2) )
+  a = sum( (theta_minus_one - leave_one_out_theta$theta_i)^3)/( 6 *(sum( (theta_minus_one - leave_one_out_theta$theta_i)^2))^(3/2) )
 
   Zu = (Z0+Za)/(1-a*(Z0+Za)) + Z0 # upper limit for Z
   Zl = (Z0-Za)/(1-a*(Z0-Za)) + Z0 # Lower limit for Z
@@ -91,7 +90,7 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   lower = ci_bca[1],
   upper = ci_bca[2],
   alpha = alpha,
-  method = "bca"
+  method = "BCa"
   )
 }
 
