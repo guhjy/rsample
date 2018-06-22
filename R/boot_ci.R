@@ -16,7 +16,7 @@ boot_ci_t <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
     stop("Your standard error (theta_se) is 0 or infinity.", call. = FALSE)
 
   z_dist <- (bt_resamples[[stat]] - theta_obs) / theta_se
-  z_pntl <- quantile(z_dist, probs = c(alpha/2, 1 - (alpha)/2), na.rm = TRUE)
+  z_pntl <- quantile(z_dist, probs = c(alpha / 2, 1 - (alpha)/2), na.rm = TRUE)
   ci <- theta_obs + z_pntl * theta_se
 
   tibble(
@@ -33,7 +33,7 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
   if (all(is.na(z_dist)))
   stop("All statistics (z_dist) are missing values.", call. = FALSE)
 
-  if (0<alpha && alpha>1)
+  if (0 < alpha && alpha > 1)
   stop("Your significance level (alpha) is unreasonable.", call. = FALSE)
 
   ci <- quantile(z_dist, probs = c(alpha/2, 1-alpha/2), na.rm = TRUE)
@@ -62,8 +62,8 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
 
   ### Estimating Z0 bias-correction
   po <- mean(bt_resamples[[stat]] <= theta_hat)
-  Z0 <-  qnorm(po)
-  Za <-  qnorm(1-alpha/2)
+  Z0 <- qnorm(po)
+  Za <- qnorm(1 - alpha / 2)
 
   # TODO clock the performance against sapply implementation
   # leave_one_out_theta = sapply(1:length(data), function(i){
@@ -80,14 +80,14 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   leave_one_out_theta <- loo_cv(data) %>%
     mutate(theta_i = get_theta_i(splits))
 
-  theta_minus_one = mean(leave_one_out_theta$theta_i)
-  a = sum( (theta_minus_one - leave_one_out_theta$theta_i)^3)/( 6 *(sum( (theta_minus_one - leave_one_out_theta$theta_i)^2))^(3/2) )
+  theta_minus_one <- mean(leave_one_out_theta$theta_i)
+  a <- sum( (theta_minus_one - leave_one_out_theta$theta_i)^3)/( 6 *(sum( (theta_minus_one - leave_one_out_theta$theta_i)^2))^(3/2) )
 
-  Zu = (Z0+Za)/(1-a*(Z0+Za)) + Z0 # upper limit for Z
-  Zl = (Z0-Za)/(1-a*(Z0-Za)) + Z0 # Lower limit for Z
-  lower_percentile = pnorm(Zl,lower.tail = TRUE) # percentile for Z
-  upper_percentile = pnorm(Zu,lower.tail = TRUE) # percentile for Z
-  ci_bca = as.numeric(quantile(bt_resamples[[stat]], c(lower_percentile, upper_percentile))) # putting those percentiles in place of alpha/2, 1-alpha/
+  Zu <-  (Z0 + Za) / ( 1 - a * (Z0 + Za)) + Z0 # upper limit for Z
+  Zl <-  (Z0-Za)/(1-a*(Z0-Za)) + Z0 # Lower limit for Z
+  lower_percentile <-  pnorm(Zl, lower.tail = TRUE) # percentile for Z
+  upper_percentile <-  pnorm(Zu, lower.tail = TRUE) # percentile for Z
+  ci_bca <- as.numeric(quantile(bt_resamples[[stat]], c(lower_percentile, upper_percentile))) # putting those percentiles in place of alpha/2, 1-alpha/
 
   tibble(
   lower = ci_bca[1],
