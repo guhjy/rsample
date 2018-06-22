@@ -16,7 +16,7 @@ set.seed(888)
 bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
-bt <- bootstraps(iris, apparent = TRUE, times = 500) %>%
+bt <- bootstraps(iris, apparent = TRUE, times = 1000) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
 # TODO sort out difference in test results between results & results_t
@@ -65,6 +65,17 @@ test_that("throw warning if theta_se equals 0 or infinity", {
     )
   )
 })
+test_that("At least B=1000 replications needed to sufficiently reduce Monte Carlo sampling Error for BCa method",{
+  expect_error(
+    rsample:::boot_ci_bca(
+      bt_resamples = bt_one %>% dplyr::filter(id != "Apparent"),
+      stat = "tmean",
+      alpha = 0.05,
+      theta_obs = bt_one %>% dplyr::filter(id == "Apparent")
+    )
+  )
+})
+
 
 test_that('z_pntl has two unique values', {
   expect_false(results_t$lower == results_t$upper)
@@ -123,6 +134,7 @@ test_that('bt_resamples is a bootstrap object', {
 })
 
 
+
 test_that('alpha is a reasonable level of significance', {
   expect_error(
     rsample:::boot_ci_perc(
@@ -160,7 +172,7 @@ test_that(
               function(y)
                 mean(analysis(y)[["rand_nums"]], na.rm = TRUE))
 
-    bt_norm <- bootstraps(x, times = 500, apparent = TRUE) %>%
+    bt_norm <- bootstraps(x, times = 1000, apparent = TRUE) %>%
       dplyr::mutate(tmean = get_mean(splits))
 
     results_boot_t <- rsample:::boot_ci_t(
@@ -187,7 +199,4 @@ test_that(
   }
 )
 
-# TODO test for sufficient number of bootstrap replications
-# test_that("At least B=1000 replications needed to reduce Monte Carlo sampling Error for BCa method",{
-#   expect_equal()
-# })
+

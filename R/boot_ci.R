@@ -49,6 +49,10 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
 
 boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
 
+  # then write a test case for that
+  if (nrow(bt_resamples) < 1000)
+    stop("Recommend at least 1000 bootstrap resamples.", call. = FALSE)
+
   # Process apparent resample
   apparent_sample <- theta_obs$splits[[1]]
   dat <- analysis(apparent_sample)
