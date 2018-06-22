@@ -134,7 +134,6 @@ test_that('bt_resamples is a bootstrap object', {
 })
 
 
-
 test_that('alpha is a reasonable level of significance', {
   expect_error(
     rsample:::boot_ci_perc(

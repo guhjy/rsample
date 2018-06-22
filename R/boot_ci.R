@@ -11,12 +11,11 @@ boot_ci_t <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
 
   theta_se <- sd(bt_resamples[[stat]], na.rm = TRUE) / sqrt(sum(!is.na((bt_resamples[[stat]]))))
 
-  # then write a test case for that
   if (theta_se == 0 | theta_se == Inf)
     stop("Your standard error (theta_se) is 0 or infinity.", call. = FALSE)
 
   z_dist <- (bt_resamples[[stat]] - theta_obs) / theta_se
-  z_pntl <- quantile(z_dist, probs = c(alpha / 2, 1 - (alpha)/2), na.rm = TRUE)
+  z_pntl <- quantile(z_dist, probs = c(alpha / 2, 1 - (alpha) / 2), na.rm = TRUE)
   ci <- theta_obs + z_pntl * theta_se
 
   tibble(
@@ -36,7 +35,7 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
   if (0 < alpha && alpha > 1)
   stop("Your significance level (alpha) is unreasonable.", call. = FALSE)
 
-  ci <- quantile(z_dist, probs = c(alpha/2, 1-alpha/2), na.rm = TRUE)
+  ci <- quantile(z_dist, probs = c(alpha / 2, 1 - alpha / 2), na.rm = TRUE)
   tibble(
     lower = ci[1],
     upper = ci[2],
@@ -81,10 +80,10 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
     mutate(theta_i = get_theta_i(splits))
 
   theta_minus_one <- mean(leave_one_out_theta$theta_i)
-  a <- sum( (theta_minus_one - leave_one_out_theta$theta_i)^3)/( 6 *(sum( (theta_minus_one - leave_one_out_theta$theta_i)^2))^(3/2) )
+  a <- sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 3) / ( 6 * (sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 2)) ^ (3 / 2) )
 
   Zu <-  (Z0 + Za) / ( 1 - a * (Z0 + Za)) + Z0 # upper limit for Z
-  Zl <-  (Z0-Za)/(1-a*(Z0-Za)) + Z0 # Lower limit for Z
+  Zl <-  (Z0 - Za) / (1 - a * (Z0 - Za)) + Z0 # Lower limit for Z
   lower_percentile <-  pnorm(Zl, lower.tail = TRUE) # percentile for Z
   upper_percentile <-  pnorm(Zu, lower.tail = TRUE) # percentile for Z
   ci_bca <- as.numeric(quantile(bt_resamples[[stat]], c(lower_percentile, upper_percentile))) # putting those percentiles in place of alpha/2, 1-alpha/
@@ -96,13 +95,3 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   method = "BCa"
   )
 }
-
-
-
-
-
-
-
-
-
-
