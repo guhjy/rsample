@@ -6,11 +6,42 @@ library(tibble)
 library(dplyr)
 
 
-# Example Code --------------------------------------------------------
+# Example Code -------------------------------------------------------
+
+# boostrap single statistic k = 1
 get_tmean <- function(x)
   map_dbl(x,
           function(x)
             mean(analysis(x)[["Sepal.Width"]], trim = 0.1))
+
+
+# boostrap several statistics k > 1
+  # bootstrap 95% CI for regression coefficents
+get_reression_means <- function(x){
+  map_dbl(x, function(x){
+
+  })
+
+}
+
+# try clasic boot implementation first, then translate to tidy style
+library(boot)
+bs <- function(formula, data, indices){
+  d <- data[indices, ]    # allows boot to select sample
+  fit <- lm(formula, data = d)
+  return(coef(fit))
+}
+
+# boostrapping with 1000 replications
+results <- boot(data = mtcars,
+                statistic = bs,
+                R = 1000,
+                formula = mpg ~ wt + disp)
+
+# plot results
+plot(results, index = 1)
+
+
 
 set.seed(888)
 bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%

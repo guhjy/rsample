@@ -66,7 +66,7 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
 
   # TODO clock loo_cv() performance against sapply implementation
   #             using loo_cv() appears significantly slower (at least for k = 1)
-  # TODO Time for k >= 2 bootstrap for regression coefficients & compare
+  # TODO Time for k > 1, e.g. bootstrap for regression coefficients & compare
 
   # leave_one_out_theta = sapply(1:length(data), function(i){
   #   leave_out_data = data[-i] # leave out the ith observation
@@ -100,7 +100,14 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
 }
 
 
-# TODO concerned about numerical precision. Default 2 sigfigs is inadequate.
-# TODO concerned about speed of loo_cv() compared to sapply() -- sunk cost?
+# can't write issues on a fork.
+# TODO concerned about numerical precision. Is default 2 sigfigs inadequate?
+          # increase num of digits in tibbles returned
+          # Is 2 enough? Is 3 enough? Is 4 enough?
+# TODO concerned about speed of loo_cv() compared to sapply() -- this week's sunk cost?
 # TODO consequently concerned about increasing test duration. 18.7s thus far.
+# TODO write desc
+# TODO keep updating API drafts
+          # visualizations (how does getting a hist look like?)
+          # parameters (? how does getting bias y std error look like)
 
