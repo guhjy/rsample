@@ -64,7 +64,10 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   Z0 <- qnorm(po)
   Za <- qnorm(1 - alpha / 2)
 
-  # TODO clock the performance against sapply implementation
+  # TODO clock loo_cv() performance against sapply implementation
+  #             using loo_cv() appears significantly slower (at least for k = 1)
+  # TODO Time for k >= 2 bootstrap for regression coefficients & compare
+
   # leave_one_out_theta = sapply(1:length(data), function(i){
   #   leave_out_data = data[-i] # leave out the ith observation
   #   theta_i = mean(leave_out_data)
@@ -82,8 +85,8 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   theta_minus_one <- mean(leave_one_out_theta$theta_i)
   a <- sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 3) / ( 6 * (sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 2)) ^ (3 / 2) )
 
-  Zu <-  (Z0 + Za) / ( 1 - a * (Z0 + Za)) + Z0 # upper limit for Z
-  Zl <-  (Z0 - Za) / (1 - a * (Z0 - Za)) + Z0 # Lower limit for Z
+  Zu <- (Z0 + Za) / ( 1 - a * (Z0 + Za)) + Z0 # upper limit for Z
+  Zl <- (Z0 - Za) / (1 - a * (Z0 - Za)) + Z0 # Lower limit for Z
   lower_percentile <-  pnorm(Zl, lower.tail = TRUE) # percentile for Z
   upper_percentile <-  pnorm(Zu, lower.tail = TRUE) # percentile for Z
   ci_bca <- as.numeric(quantile(bt_resamples[[stat]], c(lower_percentile, upper_percentile))) # putting those percentiles in place of alpha/2, 1-alpha/
@@ -95,3 +98,9 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
   method = "BCa"
   )
 }
+
+
+# TODO concerned about numerical precision. Default 2 sigfigs is inadequate.
+# TODO concerned about speed of loo_cv() compared to sapply() -- sunk cost?
+# TODO consequently concerned about increasing test duration. 18.7s thus far.
+

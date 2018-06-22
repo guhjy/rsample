@@ -151,6 +151,7 @@ test_that(
     x <- as.data.frame(rand_nums)
 
     ttest <- t.test(x)
+
     results_ttest <- tibble(
       lower = ttest$conf.int[1],
       upper = ttest$conf.int[2],
@@ -188,5 +189,6 @@ test_that(
 
   }
 )
+
 
 
