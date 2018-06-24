@@ -1,4 +1,8 @@
 #' Bootstrap Confidence Intervals
+#'
+#' @details
+#' Calculate boostrap confidence intervals for a statistic of interest
+#'
 #'  @importFrom dplyr mutate
 #'  @importFrom stats sd
 #'  @export
@@ -43,7 +47,6 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
     method = "percentile"
   )
 }
-
 
 
 boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){

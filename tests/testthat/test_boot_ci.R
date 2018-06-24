@@ -15,11 +15,53 @@ get_tmean <- function(x)
             mean(analysis(x)[["Sepal.Width"]], trim = 0.1))
 
 
+# TODO try diff of medians
+data("attrition")
+median_diff <- function(splits) {
+  x <- analysis(splits)
+  median(x$MonthlyIncome[x$Gender == "Female"]) -
+    median(x$MonthlyIncome[x$Gender == "Male"])
+}
+
+set.seed(353)
+bt_resamples <- bootstraps(attrition, times = 500)
+bt_resamples$wage_diff <- map_dbl(bt_resamples$splits, median_diff)
+
+
+ggplot(bt_resamples, aes(x = wage_diff)) +
+  geom_line(stat = "density", adjust = 1.25) +
+  xlab("Difference in Median Monthly Income (Female - Male)")
+
+
+
+# TODO write test cases for regression
 # boostrap several statistics k > 1
   # bootstrap 95% CI for regression coefficents
-get_reression_means <- function(x){
-  map_dbl(x, function(x){
+glm(Attrition ~ JobSatisfaction + Gender + MonthlyIncome, data = attrition, family = binomial)
 
+# use recipes instead
+mod_form <- as.formula(Attrition ~ JobSatisfaction + Gender + MonthlyIncome)
+
+
+glm_coefs <- function(splits, ...) {
+  ## use `analysis` or `as.data.frame` to get the analysis data
+  mod <- glm(..., data = analysis(splits), family = binomial)
+  as.data.frame(t(coef(mod)))
+}
+
+bt_resamples$betas <- map(.x = bt_resamples$splits,
+                          .f = glm_coefs,
+                          mod_form)
+bt_resamples
+
+bt_resamples$betas[[1]]
+
+
+get_reression<- function(x){
+  map_dbl(x, function(x){
+    lm(analysis(x)[[
+
+    ]])
   })
 
 }
@@ -38,9 +80,20 @@ results <- boot(data = mtcars,
                 R = 1000,
                 formula = mpg ~ wt + disp)
 
+
 # plot results
 plot(results, index = 1)
+plot(results, index = 2)
+plot(results, index = 3)
 
+## get 95% conf int
+# intercepts - boostrapped beta_nought
+boot.ci(results, type = "bca", index = 1)
+
+# wt - boostrapped coefficient
+boot.ci(results, type = "bca", index = 2)
+
+boot.ci(results, type = "bca", index = 3)
 
 
 set.seed(888)
@@ -48,6 +101,9 @@ bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
 bt <- bootstraps(iris, apparent = TRUE, times = 1000) %>%
+  dplyr::mutate(tmean = get_tmean(splits))
+
+bt_lm <- boostraps(iris, apparent = TRUE, times = 1000) %>%
   dplyr::mutate(tmean = get_tmean(splits))
 
 results_t <- rsample:::boot_ci_t(
