@@ -23,8 +23,15 @@ median_diff <- function(splits) {
 }
 
 set.seed(353)
-boot_resamples <- bootstraps(attrition, times = 500)
+boot_resamples <- bootstraps(attrition, times = 1000)
 boot_resamples$wage_diff <- map_dbl(boot_resamples$splits, median_diff)
+
+results_median <- rsample:::boot_ci_bca(
+  bt_resamples = boot_resamples %>% dplyr::filter(id != "Apparent"),
+  stat = "median_diff",
+  alpha = 0.05,
+  theta_obs = boot_resamples %>% dplyr::filter(id == "Apparent")
+)
 
 
 set.seed(888)
@@ -33,9 +40,9 @@ bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%
 
 bt <- bootstraps(iris, apparent = TRUE, times = 1000) %>%
   dplyr::mutate(tmean = get_tmean(splits))
-
-bt_lm <- boostraps(iris, apparent = TRUE, times = 1000) %>%
-  dplyr::mutate(tmean = get_tmean(splits))
+#
+# bt_lm <- boostraps(iris, apparent = TRUE, times = 1000) %>%
+#   dplyr::mutate(tmean = get_tmean(splits))
 
 results_t <- rsample:::boot_ci_t(
   bt_resamples = bt %>% dplyr::filter(id != "Apparent"),
