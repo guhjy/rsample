@@ -36,6 +36,8 @@ results_median <- rsample:::boot_ci_bca(
   theta_obs = boot_resamples %>% dplyr::filter(id == "Apparent")
 )
 
+results_median
+
 
 set.seed(888)
 bt_one <- bootstraps(iris, apparent = TRUE, times = 1) %>%

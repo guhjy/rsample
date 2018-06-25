@@ -80,7 +80,7 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
   get_theta_i <- function(x)
     map_dbl(x,
             function(x)
-              mean(analysis(x)[["dat[[var]]"]]))
+              median(analysis(x)[["dat[[var]]"]]))
   # TODO replace mean with median
   # or rather stat of interest
   # use some `do.call` magique to call `median_diff` or `get_tmean` functions
