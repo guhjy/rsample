@@ -49,7 +49,7 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
 }
 
 
-boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
+boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, theta_obs){
 
   # then write a test case for that
   if (nrow(bt_resamples) < 1000)
@@ -81,6 +81,11 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
     map_dbl(x,
             function(x)
               mean(analysis(x)[["dat[[var]]"]]))
+  # TODO replace mean with median
+  # or rather stat of interest
+  # use some `do.call` magique to call `median_diff` or `get_tmean` functions
+
+
 
   leave_one_out_theta <- loo_cv(data) %>%
     mutate(theta_i = get_theta_i(splits))
@@ -104,6 +109,9 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, var, data = NULL, theta_obs){
 
 
 # can't write issues on a fork.
+# TODO how to handle multiple `var` in boot_ci_bca
+          # one var of interest (ie Sepal.Width) but multiple (ie gender & income)
+# TODO throw error if `apparent` = TRUE for bootstrap_ci function calls
 # TODO concerned about numerical precision. Is default 2 sigfigs inadequate?
           # increase num of digits in tibbles returned
           # Is 2 enough? Is 3 enough? Is 4 enough?

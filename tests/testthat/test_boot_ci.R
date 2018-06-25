@@ -23,13 +23,16 @@ median_diff <- function(splits) {
 }
 
 set.seed(353)
-boot_resamples <- bootstraps(attrition, times = 1000)
+boot_resamples <- bootstraps(attrition, times = 1000, apparent = TRUE)
 boot_resamples$wage_diff <- map_dbl(boot_resamples$splits, median_diff)
+
 
 results_median <- rsample:::boot_ci_bca(
   bt_resamples = boot_resamples %>% dplyr::filter(id != "Apparent"),
-  stat = "median_diff",
+  stat = "wage_diff",
+  stat_fun = "median_diff",
   alpha = 0.05,
+  var = "MonthlyIncome",
   theta_obs = boot_resamples %>% dplyr::filter(id == "Apparent")
 )
 
