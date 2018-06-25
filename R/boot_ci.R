@@ -77,18 +77,20 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
   # return(theta_i)    # returns a vector of means. mean of each bootstrap resample.
   # })
 
-  get_theta_i <- function(x)
-    map_dbl(x,
-            function(x)
-              median(analysis(x)[["dat[[var]]"]]))
-  # TODO replace mean with median
+  # get_theta_i <- function(x)
+  #   map_dbl(x,
+  #           function(x)
+  #             median(analysis(x)[["dat[[var]]"]]))
+  # get_theta_i <- stat_func
+  # # TODO replace mean with median
   # or rather stat of interest
   # use some `do.call` magique to call `median_diff` or `get_tmean` functions
 
 
 
   leave_one_out_theta <- loo_cv(data) %>%
-    mutate(theta_i = get_theta_i(splits))
+    # mutate(theta_i = get_theta_i(splits))
+    mutate(theta_i = stat_func(splits))
 
   theta_minus_one <- mean(leave_one_out_theta$theta_i)
   a <- sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 3) / ( 6 * (sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 2)) ^ (3 / 2) )
