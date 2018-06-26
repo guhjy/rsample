@@ -22,6 +22,13 @@ median_diff <- function(splits) {
     median(x$MonthlyIncome[x$Gender == "Male"])
 }
 
+# stat_func <- function(splits) {
+#   x <- analysis(splits)
+#   median(x$MonthlyIncome[x$Gender == "Female"]) -
+#     median(x$MonthlyIncome[x$Gender == "Male"])
+# }
+
+
 set.seed(353)
 boot_resamples <- bootstraps(attrition, times = 1000, apparent = TRUE)
 boot_resamples$wage_diff <- map_dbl(boot_resamples$splits, median_diff)

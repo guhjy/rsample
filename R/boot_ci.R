@@ -77,12 +77,12 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
   # return(theta_i)    # returns a vector of means. mean of each bootstrap resample.
   # })
 
-  get_theta_i <- function(x)
-    map_dbl(x,
-            function(x)
-              median(analysis(x)[["dat[[var]]"]]))
+  # get_theta_i <- function(x)
+  #   map_dbl(x,
+  #           function(x)
+  #             median(analysis(x)[["dat[[var]]"]]))
 
-  get_theta_i <- do.call(stat_func)
+  get_theta_i <- do.call(stat_func, x)
   # # TODO replace mean with median
   # or rather stat of interest
   # use some `do.call` magique to call `median_diff` or `get_tmean` functions
