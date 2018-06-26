@@ -49,57 +49,34 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
 }
 
 
-boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, theta_obs){
+boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL){
 
+  # TODO then write a test case for that
   if (nrow(bt_resamples) < 1000)
-    stop("Recommend at least 1000 bootstrap resamples.", call. = FALSE)
+    warning("Recommend at least 1000 bootstrap resamples.", call. = FALSE)
 
-  # throw an error if apaprent != TRUE
   # TODO then write a test case for that
   # if(apparent != TRUE)
-  #   stop("Please set apparent = TRUE in boostraps()")
+  #   warning("Please set apparent = TRUE in boostraps()")
 
-  # Process apparent resample
-  apparent_sample <- theta_obs$splits[[1]]
-  dat <- analysis(apparent_sample)
+  # apparent_sample <- theta_obs$splits[[1]]
+  # dat <- analysis(apparent_sample)
+  dat <- bt_resamples %>% filter(id == "Apparent") %>% analysis()
+  # %>% as.data.frame(. )
+ # str(dat)
+  dat
 
-  # # What is the monthly income for females?
-  # dat$MonthlyIncome[dat$Gender == "Female"]
+# run this median test again
+  # median_difference <- median(dat$MonthlyIncome[dat$Gender == "Female"]) - median(dat$MonthlyIncome[dat$Gender == "Male"])
   #
-  # # What is the monthly income for females?
-  # dat$MonthlyIncome[dat$Gender == "Male"]
+  # mean(median_difference)
 
-
-  # wow this is assuming that the 2 vectors are the same length
-  # That is, you're assuming that each data point is 1:1 mapping of male vs female ???
-  # That actually makes no sense
-  # median_diffs <- median(dat$MonthlyIncome[dat$Gender == "Female"] - dat$MonthlyIncome[dat$Gender == "Male"])
-
-
-  median_difference <- median(dat$MonthlyIncome[dat$Gender == "Female"]) - median(dat$MonthlyIncome[dat$Gender == "Male"])
-
-  mean(median_difference)
-
-
-  # median(x$MonthlyIncome[x$Gender == "Female"]) -
-  #   median(x$MonthlyIncome[x$Gender == "Male"])
-  #
-  data <- as.data.frame(dat[[var]])
-
-  # hist(bt_resamples[[stat]])
-  # hist(attrition$MonthlyIncome)
-  #
-  # is it mean(median(x1) - median(x2)) ???
-  theta_hat <- mean(bt_resamples[[stat]])
+  theta_hat <- mean(bt_resamples[[stat]], na.rm = TRUE)
 
   ### Estimating Z0 bias-correction
   po <- mean(bt_resamples[[stat]] <= theta_hat)
   Z0 <- qnorm(po)
   Za <- qnorm(1 - alpha / 2)
-
-  # TODO clock loo_cv() performance against sapply implementation
-  #             using loo_cv() appears significantly slower (at least for k = 1)
-  # TODO Time for k > 1, e.g. bootstrap for regression coefficients & compare
 
   # leave_one_out_theta = sapply(1:length(data), function(i){
   #   leave_out_data = data[-i] # leave out the ith observation
@@ -107,24 +84,9 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
   # return(theta_i)    # returns a vector of means. mean of each bootstrap resample.
   # })
 
-  # dat
+  #  TODO double-check stat of interest
 
-  get_theta_i <- function(x)
-     map_dbl(x,
-             function(x)
-               median(analysis(x)[["dat[[var]]"]]))
-
-
-  # get_theta_i <- do.call(stat_func, x)
-
-  # # TODO replace mean with median
-  # or rather stat of interest
-  # use some `do.call` magique to call `median_diff` or `get_tmean` functions
-
-
-  loo_df <- loo_cv(data)
-
-  leave_one_out_theta <- loo_cv(data) %>%
+  leave_one_out_theta <- loo_cv(dat) %>%
     mutate(theta_i = get_theta_i(splits))
 
   theta_minus_one <- mean(leave_one_out_theta$theta_i)
@@ -132,9 +94,9 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
 
   Zu <- (Z0 + Za) / ( 1 - a * (Z0 + Za)) + Z0 # upper limit for Z
   Zl <- (Z0 - Za) / (1 - a * (Z0 - Za)) + Z0 # Lower limit for Z
-  lower_percentile <-  pnorm(Zl, lower.tail = TRUE) # percentile for Z
-  upper_percentile <-  pnorm(Zu, lower.tail = TRUE) # percentile for Z
-  ci_bca <- as.numeric(quantile(bt_resamples[[stat]], c(lower_percentile, upper_percentile))) # putting those percentiles in place of alpha/2, 1-alpha/
+  lower_percentile <- pnorm(Zl, lower.tail = TRUE) # percentile for Z
+  upper_percentile <- pnorm(Zu, lower.tail = TRUE) # percentile for Z
+  ci_bca <- as.numeric(quantile(bt_resamples[[stat]], c(lower_percentile, upper_percentile))) # use percentiles in place of (alpha / 2) and  (1 - alpha / 2)
 
   tibble(
   lower = ci_bca[1],
@@ -145,7 +107,6 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
 }
 
 
-# can't write issues on a fork.
 # TODO how to handle multiple `var` in boot_ci_bca
           # one var of interest (ie Sepal.Width) but multiple (ie gender & income)
 # TODO throw error if `apparent` = TRUE for bootstrap_ci function calls

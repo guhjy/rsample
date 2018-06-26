@@ -34,17 +34,37 @@ boot_resamples <- bootstraps(attrition, times = 1000, apparent = TRUE)
 boot_resamples$wage_diff <- map_dbl(boot_resamples$splits, median_diff)
 boot_resamples
 
+#
+# results_median <- rsample:::boot_ci_bca(
+#   bt_resamples = boot_resamples %>% dplyr::filter(id != "Apparent"),
+#   stat = "wage_diff",
+#   stat_func = median_diff,
+#   alpha = 0.05,
+#   var = "MonthlyIncome",
+#   theta_obs = boot_resamples %>% dplyr::filter(id == "Apparent")
+# )
+#
+# results_median
 
-results_median <- rsample:::boot_ci_bca(
-  bt_resamples = boot_resamples %>% dplyr::filter(id != "Apparent"),
+
+
+# example to test with: getting a regression coef for one predictor
+disp_effect <- function(dat) {
+  lm_fit <- lm(mpg ~ ., data = dat)
+  coef(lm_fit)["disp"]
+}
+
+set.seed(55)
+bt_splits <- bootstraps(mtcars, times = 20, apparent = TRUE) %>%
+  mutate(beta = map_dbl(splits, function(x) disp_effect(analysis(x))))
+
+#View(bt_splits)
+
+results_coeff <- rsample:::boot_ci_bca(
+  bt_resamples = bt_splits,
   stat = "wage_diff",
-  stat_func = median_diff,
-  alpha = 0.05,
-  var = "MonthlyIncome",
-  theta_obs = boot_resamples %>% dplyr::filter(id == "Apparent")
+  alpha = 0.05
 )
-
-results_median
 
 
 set.seed(888)
