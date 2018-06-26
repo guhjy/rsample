@@ -59,17 +59,17 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL){
   # if(apparent != TRUE)
   #   warning("Please set apparent = TRUE in boostraps()")
 
-  # apparent_sample <- theta_obs$splits[[1]]
-  # dat <- analysis(apparent_sample)
-  dat <- bt_resamples %>% filter(id == "Apparent") %>% analysis()
-  # %>% as.data.frame(. )
- # str(dat)
-  dat
+  dat <- bt_resamples %>%
+    filter(id == "Apparent") %>%
+    analysis() %>%
+    pluck("splits", 1, "data")
+# dat <- dat[["splits"]][[1]][["data"]]
+
+
 
 # run this median test again
   # median_difference <- median(dat$MonthlyIncome[dat$Gender == "Female"]) - median(dat$MonthlyIncome[dat$Gender == "Male"])
   #
-  # mean(median_difference)
 
   theta_hat <- mean(bt_resamples[[stat]], na.rm = TRUE)
 
@@ -109,13 +109,15 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL){
 
 # TODO how to handle multiple `var` in boot_ci_bca
           # one var of interest (ie Sepal.Width) but multiple (ie gender & income)
+
 # TODO throw error if `apparent` = TRUE for bootstrap_ci function calls
+
 # TODO concerned about numerical precision. Is default 2 sigfigs inadequate?
           # increase num of digits in tibbles returned
           # Is 2 enough? Is 3 enough? Is 4 enough?
-# TODO concerned about speed of loo_cv() compared to sapply() -- this week's sunk cost?
-# TODO consequently concerned about increasing test duration. 18.7s thus far.
+
 # TODO write desc
+
 # TODO keep updating API drafts
           # visualizations (how does getting a hist look like?)
           # parameters (? how does getting bias y std error look like)

@@ -62,7 +62,7 @@ bt_splits <- bootstraps(mtcars, times = 20, apparent = TRUE) %>%
 
 results_coeff <- rsample:::boot_ci_bca(
   bt_resamples = bt_splits,
-  stat = "wage_diff",
+  stat = "beta",
   alpha = 0.05
 )
 
