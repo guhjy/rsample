@@ -65,12 +65,20 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL){
     pluck("splits", 1, "data")
 # dat <- dat[["splits"]][[1]][["data"]]
 
-
 # run this median test again
   # median_difference <- median(dat$MonthlyIncome[dat$Gender == "Female"]) - median(dat$MonthlyIncome[dat$Gender == "Male"])
-  #
 
-  theta_hat <- mean(bt_resamples[[stat]], na.rm = TRUE)
+
+  # TODO
+  # still want this to be generalised
+  # want to call in get_theta_i for beta coefficient from original data set
+  # theta_hat <- mean(bt_resamples[[stat]], na.rm = TRUE)
+  get_theta_i <-  function(dat) {
+    lm_fit <- lm(mpg ~ ., data = dat)
+    coef(lm_fit)["disp"]
+  }
+  theta_hat <- get_theta_i(dat)
+
 
   ### Estimating Z0 bias-correction
   po <- mean(bt_resamples[[stat]] <= theta_hat)
@@ -83,18 +91,13 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL){
   # return(theta_i)    # returns a vector of means. mean of each bootstrap resample.
   # })
 
-  #  TODO double-check stat of interest
-
-  # TODO double-check Hastie y Tibshirani (1994)
-  # same problems again
-  # get_theta_i <-  function(dat) {
-  #   lm_fit <- lm(mpg ~ ., data = dat)
-  #   coef(lm_fit)["disp"]
-  # }
-
-
+  # TODO
+  # generalise to different funtions
+  # want to call in the `disp_effect` function here
   leave_one_out_theta <- loo_cv(dat) %>%
-    mutate(theta_i = get_theta_i(splits))
+    analysis() %>%
+    pluck("splits")
+    # mutate(theta_i = get_theta_i(splits))
 
   theta_minus_one <- mean(leave_one_out_theta$theta_i)
   a <- sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 3) / ( 6 * (sum( (theta_minus_one - leave_one_out_theta$theta_i) ^ 2)) ^ (3 / 2) )

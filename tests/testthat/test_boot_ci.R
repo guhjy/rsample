@@ -58,13 +58,16 @@ set.seed(55)
 bt_splits <- bootstraps(mtcars, times = 20, apparent = TRUE) %>%
   mutate(beta = map_dbl(splits, function(x) disp_effect(analysis(x))))
 
-#View(bt_splits)
+View(bt_splits)
 
 results_coeff <- rsample:::boot_ci_bca(
   bt_resamples = bt_splits,
   stat = "beta",
   alpha = 0.05
 )
+
+
+
 
 
 set.seed(888)
