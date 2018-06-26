@@ -32,6 +32,7 @@ median_diff <- function(splits) {
 set.seed(353)
 boot_resamples <- bootstraps(attrition, times = 1000, apparent = TRUE)
 boot_resamples$wage_diff <- map_dbl(boot_resamples$splits, median_diff)
+boot_resamples
 
 
 results_median <- rsample:::boot_ci_bca(

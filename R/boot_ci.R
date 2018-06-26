@@ -51,15 +51,45 @@ boot_ci_perc <- function(bt_resamples, stat, alpha, data = NULL, theta_obs) {
 
 boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, theta_obs){
 
-  # then write a test case for that
   if (nrow(bt_resamples) < 1000)
     stop("Recommend at least 1000 bootstrap resamples.", call. = FALSE)
+
+  # throw an error if apaprent != TRUE
+  # TODO then write a test case for that
+  # if(apparent != TRUE)
+  #   stop("Please set apparent = TRUE in boostraps()")
 
   # Process apparent resample
   apparent_sample <- theta_obs$splits[[1]]
   dat <- analysis(apparent_sample)
+
+  # What is the monthly income for females?
+  dat$MonthlyIncome[dat$Gender == "Female"]
+
+  # What is the monthly income for females?
+  dat$MonthlyIncome[dat$Gender == "Male"]
+
+
+  # wow this is assuming that the 2 vectors are the same length
+  # That is, you're assuming that each data point is 1:1 mapping of male vs female ???
+  # That actually makes no sense
+  median_diffs <- median(dat$MonthlyIncome[dat$Gender == "Female"] - dat$MonthlyIncome[dat$Gender == "Male"])
+
+
+  median_difference <- median(dat$MonthlyIncome[dat$Gender == "Female"]) - median(dat$MonthlyIncome[dat$Gender == "Male"])
+
+  mean(median_difference)
+
+
+  # median(x$MonthlyIncome[x$Gender == "Female"]) -
+  #   median(x$MonthlyIncome[x$Gender == "Male"])
+  #
   data <- as.data.frame(dat[[var]])
 
+  # hist(bt_resamples[[stat]])
+  # hist(attrition$MonthlyIncome)
+  #
+  # is it mean(median(x1) - median(x2)) ???
   theta_hat <- mean(bt_resamples[[stat]])
 
   ### Estimating Z0 bias-correction
@@ -77,17 +107,22 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
   # return(theta_i)    # returns a vector of means. mean of each bootstrap resample.
   # })
 
-  # get_theta_i <- function(x)
-  #   map_dbl(x,
-  #           function(x)
-  #             median(analysis(x)[["dat[[var]]"]]))
+  # dat
 
-  get_theta_i <- do.call(stat_func, x)
+  get_theta_i <- function(x)
+     map_dbl(x,
+             function(x)
+               median(analysis(x)[["dat[[var]]"]]))
+
+
+  # get_theta_i <- do.call(stat_func, x)
+
   # # TODO replace mean with median
   # or rather stat of interest
   # use some `do.call` magique to call `median_diff` or `get_tmean` functions
 
 
+  loo_df <- loo_cv(data)
 
   leave_one_out_theta <- loo_cv(data) %>%
     mutate(theta_i = get_theta_i(splits))
