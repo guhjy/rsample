@@ -63,17 +63,17 @@ boot_ci_bca <- function(bt_resamples, stat, stat_func, alpha, var, data = NULL, 
   apparent_sample <- theta_obs$splits[[1]]
   dat <- analysis(apparent_sample)
 
-  # What is the monthly income for females?
-  dat$MonthlyIncome[dat$Gender == "Female"]
-
-  # What is the monthly income for females?
-  dat$MonthlyIncome[dat$Gender == "Male"]
+  # # What is the monthly income for females?
+  # dat$MonthlyIncome[dat$Gender == "Female"]
+  #
+  # # What is the monthly income for females?
+  # dat$MonthlyIncome[dat$Gender == "Male"]
 
 
   # wow this is assuming that the 2 vectors are the same length
   # That is, you're assuming that each data point is 1:1 mapping of male vs female ???
   # That actually makes no sense
-  median_diffs <- median(dat$MonthlyIncome[dat$Gender == "Female"] - dat$MonthlyIncome[dat$Gender == "Male"])
+  # median_diffs <- median(dat$MonthlyIncome[dat$Gender == "Female"] - dat$MonthlyIncome[dat$Gender == "Male"])
 
 
   median_difference <- median(dat$MonthlyIncome[dat$Gender == "Female"]) - median(dat$MonthlyIncome[dat$Gender == "Male"])
