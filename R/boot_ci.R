@@ -57,14 +57,13 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL){
 
   # TODO then write a test case for that
   # if(apparent != TRUE)
-  #   warning("Please set apparent = TRUE in boostraps()")
+  #   warning("Please set apparent = TRUE in bootsraps()")
 
   dat <- bt_resamples %>%
     filter(id == "Apparent") %>%
     analysis() %>%
     pluck("splits", 1, "data")
 # dat <- dat[["splits"]][[1]][["data"]]
-
 
 
 # run this median test again
@@ -85,6 +84,14 @@ boot_ci_bca <- function(bt_resamples, stat, alpha, data = NULL){
   # })
 
   #  TODO double-check stat of interest
+
+  # TODO double-check Hastie y Tibshirani (1994)
+  # same problems again
+  # get_theta_i <-  function(dat) {
+  #   lm_fit <- lm(mpg ~ ., data = dat)
+  #   coef(lm_fit)["disp"]
+  # }
+
 
   leave_one_out_theta <- loo_cv(dat) %>%
     mutate(theta_i = get_theta_i(splits))
