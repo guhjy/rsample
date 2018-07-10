@@ -1,3 +1,5 @@
+# Is lables.R a typo in file name?
+
 #' Find Labels from rset Object
 #'
 #' Produce a vector of resampling labels (e.g. "Fold1") from
@@ -40,8 +42,8 @@ labels.vfold_cv <- function(object, make_factor = FALSE, ...) {
 
 #' Find Labels from rsplit Object
 #'
-#' Produce a tibble of identification variables so that single 
-#'  splits can be linked to a particular resample. 
+#' Produce a tibble of identification variables so that single
+#'  splits can be linked to a particular resample.
 #'
 #' @param object An `rsplit` object
 #' @param ... Not currently used.
